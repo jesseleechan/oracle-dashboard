@@ -1,6 +1,18 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Briefcase, Sparkles, Coins, Lightbulb, Smile, MessageCircle, Activity, Heart, ChevronRight } from "lucide-react";
+
+const ICON_MAP = {
+  "Career Ambition": Briefcase,
+  "Spiritual Attunement": Sparkles,
+  "Financial Resources": Coins,
+  "Mental Flow": Lightbulb,
+  "Emotional State": Smile,
+  "Social Connection": MessageCircle,
+  "Physical Vitality": Activity,
+  "Romantic Charge": Heart
+};
 
 const CardBack = () => (
   <svg viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
@@ -56,6 +68,7 @@ export default function MundaneDashboard() {
   const [transitData, setTransitData] = useState(null);
   const [transitLoading, setTransitLoading] = useState(true);
   const [satsMode, setSatsMode] = useState(false);
+  const [flowState, setFlowState] = useState("Flow");
   const [aiOutput, setAiOutput] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [initialAiFetched, setInitialAiFetched] = useState(false);
@@ -159,7 +172,8 @@ export default function MundaneDashboard() {
             universalDay: numerology.universalDay,
             transitAspect: transitData?.transit?.aspect, // Use optional chaining
             tarotCards: visibleCards.map((c) => c.name).join(", "),
-            scene: scene.trim()
+            scene: scene.trim(),
+            flowState: flowState
           })
         });
         setAnchored(true);
@@ -273,19 +287,25 @@ export default function MundaneDashboard() {
                  ✦ Synthesizing energetic weather...
               </div>
             ) : (
-              aiOutput.energyRatings && Array.isArray(aiOutput.energyRatings) && aiOutput.energyRatings.map((rating, idx) => (
-                <div key={idx} style={{ 
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  fontSize: '14px', color: 'rgba(255,255,255,0.8)'
-                }}>
-                  <span>{rating.category}</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ color: 'var(--gold)' }}>{rating.rating}</span>
-                    <span style={{ opacity: 0.3, fontSize: '12px' }}>›</span>
+              aiOutput.energyRatings && Array.isArray(aiOutput.energyRatings) && aiOutput.energyRatings.map((rating, idx) => {
+                const IconComponent = ICON_MAP[rating.category] || Activity;
+                return (
+                  <div key={idx} style={{ 
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    fontSize: '14px', color: 'rgba(255,255,255,0.8)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <IconComponent size={16} strokeWidth={1.5} style={{ opacity: 0.6 }} />
+                      <span>{rating.category}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: 'var(--gold)' }}>{rating.rating}</span>
+                      <ChevronRight size={14} style={{ opacity: 0.3 }} />
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </section>
@@ -341,14 +361,42 @@ export default function MundaneDashboard() {
             </div>
 
             <div className="goddard-block">
-              <div className="goddard-prompt">Neville Goddard Protocol</div>
+              <div className="goddard-prompt" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Neville Goddard Protocol</span>
+              </div>
+              
               <textarea 
                 className="scene-textarea" 
                 placeholder="Describe your desired reality as if you are already experiencing it..." 
                 value={scene} 
                 onChange={(e) => setScene(e.target.value)} 
                 disabled={anchored}
+                style={{ minHeight: '120px' }}
               />
+
+              <div className="flow-tracker" style={{ 
+                margin: '8px 0 16px', display: 'flex', background: 'rgba(255,255,255,0.02)', 
+                borderRadius: '6px', padding: '4px', border: '1px solid rgba(255,255,255,0.05)' 
+              }}>
+                {["High Friction", "Neutral", "Pure Flow"].map((level) => (
+                  <button
+                    key={level}
+                    disabled={anchored}
+                    onClick={() => setFlowState(level)}
+                    style={{
+                      flex: 1, padding: '8px 0', fontSize: '12px', fontFamily: 'monospace',
+                      background: flowState === level ? 'rgba(201,169,110,0.1)' : 'transparent',
+                      color: flowState === level ? 'var(--gold)' : 'rgba(255,255,255,0.4)',
+                      border: 'none', borderRadius: '4px', cursor: anchored ? 'default' : 'pointer',
+                      transition: 'all 0.2s ease', 
+                      pointerEvents: anchored ? 'none' : 'auto'
+                    }}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+
               <div className="anchor-row">
                 <input 
                   type="checkbox" 

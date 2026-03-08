@@ -15,7 +15,7 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { date, universalDay, transitAspect, tarotCards, scene } = await request.json();
+    const { date, universalDay, transitAspect, tarotCards, scene, flowState } = await request.json();
 
     const newLog = await prisma.log.create({
       data: {
@@ -23,7 +23,8 @@ export async function POST(request) {
         universalDay,
         transitAspect,
         tarotCards,
-        scene
+        scene,
+        flowState
       }
     });
 

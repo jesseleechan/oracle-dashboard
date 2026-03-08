@@ -17,5 +17,6 @@ model Log {
   transitAspect String
   tarotCards    String
   scene         String
+  flowState     String?
   createdAt     DateTime @default(now())
 }
