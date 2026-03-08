@@ -17,6 +17,10 @@ export async function GET(request) {
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 
-  const selected = deck.slice(0, count).map(card => ({ ...card, flipped: false }));
+  const selected = deck.slice(0, count).map(card => ({ 
+    ...card, 
+    flipped: false,
+    isReversed: Math.random() < 0.5
+  }));
   return NextResponse.json(selected);
 }

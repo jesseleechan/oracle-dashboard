@@ -1,7 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Briefcase, Sparkles, Coins, Lightbulb, Smile, MessageCircle, Activity, Heart, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Briefcase, Sparkles, Coins, Lightbulb, Smile, MessageCircle, Activity, Heart, ChevronRight, Variable } from "lucide-react";
+import Link from 'next/link';
+
+import { useOracleData } from '@/hooks/useOracleData';
+import StarfieldCanvas from '@/components/StarfieldCanvas';
+import SatsOverlay from '@/components/SatsOverlay';
+import TarotStage from '@/components/TarotStage';
+import SynthesisEngine from '@/components/SynthesisEngine';
 
 const ICON_MAP = {
   "Career Ambition": Briefcase,
@@ -14,104 +21,17 @@ const ICON_MAP = {
   "Romantic Charge": Heart
 };
 
-const CardBack = () => (
-  <svg viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
-    <rect width="120" height="200" rx="8" fill="#0e0e1a" stroke="#c9a96e" strokeWidth="1.2" />
-    <rect x="8" y="8" width="104" height="184" rx="5" fill="none" stroke="#c9a96e" strokeWidth="0.6" strokeDasharray="3 3" opacity="0.5" />
-    <circle cx="60" cy="100" r="32" fill="none" stroke="#c9a96e" strokeWidth="0.8" opacity="0.6" />
-    <circle cx="60" cy="100" r="20" fill="none" stroke="#c9a96e" strokeWidth="0.4" opacity="0.4" />
-    {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
-      <line key={i}
-        x1={60 + 20 * Math.cos((deg * Math.PI) / 180)}
-        y1={100 + 20 * Math.sin((deg * Math.PI) / 180)}
-        x2={60 + 32 * Math.cos((deg * Math.PI) / 180)}
-        y2={100 + 32 * Math.sin((deg * Math.PI) / 180)}
-        stroke="#c9a96e" strokeWidth="0.6" opacity="0.5"
-      />
-    ))}
-    <text x="60" y="55" textAnchor="middle" fill="#c9a96e" fontSize="10" opacity="0.5" fontFamily="serif">✦</text>
-    <text x="60" y="155" textAnchor="middle" fill="#c9a96e" fontSize="10" opacity="0.5" fontFamily="serif">✦</text>
-  </svg>
-);
-
-const CardFace = ({ card }) => (
-  <svg viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
-    <rect width="120" height="200" rx="8" fill="#13101f" stroke="#c9a96e" strokeWidth="1.2" />
-    <rect x="6" y="6" width="108" height="188" rx="5" fill="none" stroke="#c9a96e" strokeWidth="0.5" opacity="0.4" />
-    <text x="60" y="32" textAnchor="middle" fill="#c9a96e" fontSize="9" fontFamily="serif" opacity="0.7">{card.num}</text>
-    <text x="60" y="115" textAnchor="middle" fill="#c9a96e" fontSize="28" fontFamily="serif">
-      {card.num === "0" ? "☽" : card.num === "I" ? "☿" : card.num === "II" ? "☽" : card.num === "III" ? "♀" :
-        card.num === "IV" ? "♂" : card.num === "V" ? "♃" : card.num === "VI" ? "♀" :
-          card.num === "VII" ? "♂" : card.num === "VIII" ? "☀" : card.num === "IX" ? "☿" :
-            card.num === "X" ? "♃" : card.num === "XI" ? "♎" : card.num === "XII" ? "♆" :
-              card.num === "XIII" ? "♏" : card.num === "XIV" ? "♐" : card.num === "XV" ? "♑" :
-                card.num === "XVI" ? "♂" : card.num === "XVII" ? "♒" : card.num === "XVIII" ? "☽" :
-                  card.num === "XIX" ? "☀" : card.num === "XX" ? "♇" : "✦"}
-    </text>
-    <text x="60" y="148" textAnchor="middle" fill="#e8dfc8" fontSize="8.5" fontFamily="serif" fontWeight="500">{card.name}</text>
-    <line x1="20" y1="155" x2="100" y2="155" stroke="#c9a96e" strokeWidth="0.5" opacity="0.5" />
-    {card.keywords.split(" · ").map((kw, i) => (
-      <text key={i} x="60" y={166 + i * 10} textAnchor="middle" fill="#c9a96e" fontSize="6.5" fontFamily="serif" opacity="0.7">{kw}</text>
-    ))}
-  </svg>
-);
-
-const SPREAD_LABELS = ["Current State", "Friction", "The Anchor"];
-
 export default function MundaneDashboard() {
+  const { numerology, transitData, transitLoading, cards, setCards, fetchCards } = useOracleData();
   const [spreadMode, setSpreadMode] = useState("daily");
-  const [cards, setCards] = useState([]);
-  const [numerology, setNumerology] = useState({ universalDay: "?" });
   
   const [anchored, setAnchored] = useState(false);
   const [scene, setScene] = useState("");
-  const [transitData, setTransitData] = useState(null);
-  const [transitLoading, setTransitLoading] = useState(true);
   const [satsMode, setSatsMode] = useState(false);
   const [flowState, setFlowState] = useState("Flow");
   const [aiOutput, setAiOutput] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [initialAiFetched, setInitialAiFetched] = useState(false);
-  const [logOpen, setLogOpen] = useState(false);
-  const [log, setLog] = useState([]);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
-  const canvasRef = useRef(null);
-  const animRef = useRef(null);
-
-  useEffect(() => {
-    fetchCards(3);
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    try {
-      const numRes = await fetch('/api/numerology');
-      const numData = await numRes.json();
-      setNumerology(numData);
-
-      setTransitLoading(true);
-      const astRes = await fetch('/api/astrology');
-      const astData = await astRes.json();
-      setTransitData(astData);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setTransitLoading(false);
-    }
-  }
-
-  async function fetchCards(count) {
-    try {
-      const res = await fetch(`/api/tarot?count=${count}`);
-      const data = await res.json();
-      setCards(data);
-      setAiOutput(null);
-      setAnchored(false);
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   const visibleCards = spreadMode === "daily" ? (cards.length ? [cards[0]] : []) : cards;
 
@@ -121,8 +41,14 @@ export default function MundaneDashboard() {
     );
   }
 
+  async function handleFetchCards(count) {
+    await fetchCards(count);
+    setAiOutput(null);
+    setAnchored(false);
+  }
+
   function reshuffle() {
-    fetchCards(spreadMode === 'daily' ? 1 : 3);
+    handleFetchCards(spreadMode === 'daily' ? 1 : 3);
   }
 
   async function generateStudioInsight() {
@@ -133,12 +59,15 @@ export default function MundaneDashboard() {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tarotCards: visibleCards.map(c => c.name),
+          tarotCards: visibleCards.map(c => `${c.name} (${c.isReversed ? 'Reversed' : 'Upright'})`),
           universalDay: numerology.universalDay,
           transit: transitData?.transit // Use optional chaining
         })
       });
 
+      if (response.status === 429) {
+        throw new Error('QUOTA_EXCEEDED');
+      }
       if (!response.ok) {
         throw new Error('API request failed');
       }
@@ -147,19 +76,14 @@ export default function MundaneDashboard() {
       setAiOutput(data);
     } catch (e) {
       console.error(e);
-      setAiOutput({ tags: ["#HighDemand", "#CosmicStatic"], insight: "The synthesis engine is currently meditating under high cosmic demand. Please cast again in a moment." });
+      if (e.message === 'QUOTA_EXCEEDED') {
+        setAiOutput({ tags: ["#CosmicRest", "#DailyLimitReached"], insight: "The Oracle has reached its daily cosmic generation limit (Free Tier). Please return tomorrow when the ether clears, or click 'Generate' again to verify if the cooldown has lifted." });
+      } else {
+        setAiOutput({ tags: ["#HighDemand", "#CosmicStatic"], insight: "The synthesis engine is currently meditating under high cosmic demand. Please cast again in a moment." });
+      }
     }
     setAiLoading(false);
   }
-
-  // Auto-trigger synthesis on load when data is ready
-  useEffect(() => {
-    if (!initialAiFetched && !transitLoading && transitData?.transit && numerology.universalDay !== "?" && cards.length > 0) {
-      // Don't generate if visible cards aren't fully resolved or flipped initially
-      generateStudioInsight();
-      setInitialAiFetched(true);
-    }
-  }, [transitLoading, transitData, numerology, cards, initialAiFetched, visibleCards]);
 
   async function handleAnchor() {
     if (!anchored && scene.trim()) {
@@ -171,7 +95,7 @@ export default function MundaneDashboard() {
             date: new Date().toLocaleDateString(),
             universalDay: numerology.universalDay,
             transitAspect: transitData?.transit?.aspect, // Use optional chaining
-            tarotCards: visibleCards.map((c) => c.name).join(", "),
+            tarotCards: visibleCards.map((c) => `${c.name} (${c.isReversed ? 'Reversed' : 'Upright'})`).join(", "),
             scene: scene.trim(),
             flowState: flowState
           })
@@ -185,67 +109,24 @@ export default function MundaneDashboard() {
     }
   }
 
-  // Starfield canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const stars = Array.from({ length: 120 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
-      a: Math.random(),
-      speed: Math.random() * 0.003 + 0.001,
-    }));
-    let t = 0;
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach((s) => {
-        const alpha = 0.2 + 0.5 * Math.abs(Math.sin(t * s.speed + s.a));
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201,169,110,${alpha})`;
-        ctx.fill();
-      });
-      t += 1;
-      animRef.current = requestAnimationFrame(draw);
-    }
-    draw();
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    window.addEventListener("resize", resize);
-    return () => { cancelAnimationFrame(animRef.current); window.removeEventListener("resize", resize); };
-  }, []);
+  // Starfield canvas logic has been extracted to StarfieldCanvas.jsx
+  const getThemeStyle = () => {
+    if (!transitData?.transit?.aspect) return {};
+    const aspect = transitData.transit.aspect.toLowerCase();
+    
+    if (aspect.includes("mars")) return { "--bg": "#120505", "--surface": "#1a0808", "--rose": "#d66a6a", "--gold": "#c96e6e" };
+    if (aspect.includes("neptune") || aspect.includes("moon")) return { "--bg": "#050812", "--surface": "#080d1a", "--gold": "#a9b9c9", "--rose": "#9a9ac4" };
+    if (aspect.includes("venus") || aspect.includes("jupiter")) return { "--bg": "#0f0812", "--surface": "#140a1a", "--gold": "#c9a9c9" };
+    if (aspect.includes("saturn") || aspect.includes("pluto")) return { "--bg": "#040404", "--surface": "#0a0a0a", "--text": "#bfbfbf", "--gold": "#8a8a8a" };
+    return {};
+  };
 
   return (
     <>
-      {satsMode && (
-        <div 
-          className="sats-overlay flex-center" 
-          onClick={() => setSatsMode(false)}
-          style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            backgroundColor: '#000000', zIndex: 9999, cursor: 'pointer',
-            padding: '2rem', boxSizing: 'border-box'
-          }}
-        >
-          <div style={{
-            color: '#ffffff',
-            opacity: 0.8,
-            fontFamily: 'Georgia, serif',
-            fontSize: 'clamp(24px, 5vw, 42px)',
-            lineHeight: 1.4,
-            textAlign: 'center',
-            maxWidth: '800px'
-          }}>
-            {scene || "No scene anchored."}
-          </div>
-        </div>
-      )}
+      <SatsOverlay satsMode={satsMode} setSatsMode={setSatsMode} scene={scene} />
 
-      <div className="dashboard">
-        <canvas ref={canvasRef} className="starfield" />
+      <div className="dashboard" style={getThemeStyle()}>
+        <StarfieldCanvas transitData={transitData} />
       <div className="noise" />
       <div className="content">
         <header>
@@ -289,19 +170,28 @@ export default function MundaneDashboard() {
             ) : (
               aiOutput.energyRatings && Array.isArray(aiOutput.energyRatings) && aiOutput.energyRatings.map((rating, idx) => {
                 const IconComponent = ICON_MAP[rating.category] || Activity;
+                const getRatingPercentage = (r) => {
+                  if (r === "Strong") return "90%";
+                  if (r === "Active") return "65%";
+                  if (r === "Light") return "30%";
+                  return "50%";
+                };
                 return (
                   <div key={idx} style={{ 
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.05)',
                     fontSize: '14px', color: 'rgba(255,255,255,0.8)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <IconComponent size={16} strokeWidth={1.5} style={{ opacity: 0.6 }} />
-                      <span>{rating.category}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <IconComponent size={16} strokeWidth={1.5} style={{ opacity: 0.6 }} />
+                        <span>{rating.category}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: 'var(--gold)' }}>{rating.rating}</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: 'var(--gold)' }}>{rating.rating}</span>
-                      <ChevronRight size={14} style={{ opacity: 0.3 }} />
+                    <div className="energy-progress-bg">
+                      <div className="energy-progress-fill" style={{ width: getRatingPercentage(rating.rating) }} />
                     </div>
                   </div>
                 );
@@ -310,55 +200,23 @@ export default function MundaneDashboard() {
           </div>
         </section>
 
-        <section className="section">
-          <div className="section-label">The Oracle</div>
-          <div className="oracle-toggle">
-            <button className={`toggle-btn ${spreadMode === 'daily' ? 'active' : ''}`} onClick={() => { setSpreadMode('daily'); fetchCards(1); }}>Daily Draw</button>
-            <button className={`toggle-btn ${spreadMode === 'three' ? 'active' : ''}`} onClick={() => { setSpreadMode('three'); fetchCards(3); }}>Three Card</button>
-          </div>
-
-          <div className="card-stage">
-            {visibleCards.map((card, i) => (
-              <div key={i} className="card-slot">
-                <div className="card-wrapper" onClick={() => flipCard(i)}>
-                  <div className={`card-inner ${card.flipped ? 'flipped' : ''}`}>
-                    <div className="card-back-side"><CardBack /></div>
-                    <div className="card-face"><CardFace card={card} /></div>
-                  </div>
-                </div>
-                {spreadMode === 'three' && <div className="card-slot-label">{SPREAD_LABELS[i]}</div>}
-              </div>
-            ))}
-          </div>
-          
-          {visibleCards.length === 1 && visibleCards[0].flipped && (
-             <div className="card-reveal">
-               <div className="card-reveal-name">{visibleCards[0].name}</div>
-               <div className="card-reveal-keys">{visibleCards[0].keywords}</div>
-             </div>
-          )}
-
-          <button className="reshuffle-btn" onClick={reshuffle}>Reshuffle</button>
-        </section>
+        <TarotStage 
+          spreadMode={spreadMode} 
+          setSpreadMode={setSpreadMode} 
+          visibleCards={visibleCards} 
+          fetchCards={handleFetchCards} 
+          flipCard={flipCard} 
+          reshuffle={reshuffle} 
+        />
 
         <section className="section">
           <div className="action-grid">
-            <div className={`studio-block ${(aiOutput || aiLoading) ? 'expanded' : ''}`}>
-              <div className="studio-header">
-                <div className="section-label" style={{ marginBottom: 0, gap: '8px' }}>Studio Synthesis</div>
-                <button className="generate-btn" onClick={generateStudioInsight} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
-                  {aiLoading ? <div className="loading-pulse"><span/><span/><span/></div> : (aiOutput ? "Refresh Synthesis" : "Translate to Action")}
-                </button>
-              </div>
-              {aiOutput && (
-                <>
-                  <div className="studio-tags">
-                    {aiOutput.tags && Array.isArray(aiOutput.tags) ? aiOutput.tags.map(tag => <span key={tag} className="tag">{tag}</span>) : null}
-                  </div>
-                  <div className="studio-insight" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{aiOutput.insight}</div>
-                </>
-              )}
-            </div>
+            <SynthesisEngine 
+              aiOutput={aiOutput} 
+              aiLoading={aiLoading} 
+              visibleCards={visibleCards} 
+              generateStudioInsight={generateStudioInsight} 
+            />
 
             <div className="goddard-block">
               <div className="goddard-prompt" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -423,9 +281,8 @@ export default function MundaneDashboard() {
 
         <footer>
           <div className="footer-nav">
-            <button className="footer-link">Dashboard</button>
-            <button className="footer-link">Log Archive</button>
-            <button className="footer-link">Settings</button>
+            <button className="footer-link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Dashboard</button>
+            <Link href="/archive" className="footer-link" style={{ textDecoration: 'none' }}>Log Archive</Link>
           </div>
           <div className="footer-status">DB Connected · AI Ready</div>
         </footer>

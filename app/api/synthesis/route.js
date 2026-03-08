@@ -31,7 +31,7 @@ Today's cosmic data:
 - Moon Phase: ${currentPhase}
 - Transit: ${transit.aspect}
 - Universal Day Number: ${universalDay}
-- Tarot cards drawn: ${tarotCards.join(", ")}
+- Tarot cards drawn: ${tarotCards}
 
 Generate generalized, holistic guidance that applies to ${USER_CONSTANTS.name}'s broader life, creativity, and daily rhythms. 
 If multiple tarot cards are drawn, you MUST synthesize the combined narrative of ALL the cards provided in relation to the user's state.
@@ -44,7 +44,7 @@ Return a strict JSON object with this exact structure:
   Categories: Career Ambition, Spiritual Attunement, Financial Resources, Mental Flow, Emotional State, Social Connection, Physical Vitality, Romantic Charge`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -81,6 +81,9 @@ Return a strict JSON object with this exact structure:
     return NextResponse.json(parsed);
   } catch (error) {
     console.error("Synthesis generation failed:", error);
+    if (error.status === 429 || error.message?.includes('429') || error.message?.includes('Quota')) {
+      return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+    }
     return NextResponse.json({ error: "Failed to generate synthesis" }, { status: 500 });
   }
 }
