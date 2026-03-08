@@ -343,7 +343,7 @@ export default function MundaneDashboard() {
 
         <section className="section">
           <div className="action-grid">
-            <div className="studio-block">
+            <div className={`studio-block ${(aiOutput || aiLoading) ? 'expanded' : ''}`}>
               <div className="studio-header">
                 <div className="section-label" style={{ marginBottom: 0, gap: '8px' }}>Studio Synthesis</div>
                 <button className="generate-btn" onClick={generateStudioInsight} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
@@ -355,7 +355,7 @@ export default function MundaneDashboard() {
                   <div className="studio-tags">
                     {aiOutput.tags && Array.isArray(aiOutput.tags) ? aiOutput.tags.map(tag => <span key={tag} className="tag">{tag}</span>) : null}
                   </div>
-                  <div className="studio-insight">{aiOutput.insight}</div>
+                  <div className="studio-insight" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{aiOutput.insight}</div>
                 </>
               )}
             </div>

@@ -464,6 +464,15 @@ header {
   padding: 36px 40px;
   border-radius: 2px;
   height: 100%;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top center;
+}
+
+.studio-block.expanded {
+  transform: scale(1.02);
+  border-color: rgba(201,169,110, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(201,169,110, 0.1);
+  background: linear-gradient(to bottom, var(--surface), #11111a);
 }
 
 .studio-header {

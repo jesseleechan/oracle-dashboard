@@ -34,6 +34,7 @@ Today's cosmic data:
 - Tarot cards drawn: ${tarotCards.join(", ")}
 
 Generate generalized, holistic guidance that applies to ${USER_CONSTANTS.name}'s broader life, creativity, and daily rhythms. 
+If multiple tarot cards are drawn, you MUST synthesize the combined narrative of ALL the cards provided in relation to the user's state.
 Use the moon phase (${currentPhase}) to determine the natural workflow rhythm (e.g., Waxing = initiating, Waning = refining/resting), but filter this entirely through the lens of effortless manifestation and allowing the 3D world to catch up to the 4D state.
 
 Return a strict JSON object with this exact structure:
@@ -57,7 +58,7 @@ Return a strict JSON object with this exact structure:
             },
             insight: {
               type: Type.STRING,
-              description: "A 2-3 sentence practical holistic directive"
+              description: "A detailed, elegantly written 2-paragraph reading. Paragraph 1: The cosmic and numerological weather. Paragraph 2: A synthesis of ALL drawn tarot cards, filtered strictly through the Law of Reverse Effort. Separate paragraphs with a newline character (\\n)."
             },
             energyRatings: {
               type: Type.ARRAY,
