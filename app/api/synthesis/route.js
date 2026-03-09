@@ -5,7 +5,7 @@ import { Moon } from 'lunarphase-js';
 
 export async function POST(request) {
   try {
-    const { tarotCards, universalDay, transit, geminiSuffix, customApiKey, planetaryHour, personalYear, personalMonth, personalDay, hermeticPrinciple } = await request.json();
+    const { tarotCards, universalDay, transit, geminiSuffix, customApiKey, planetaryHour, personalYear, personalMonth, personalDay, hermeticPrinciple, assumptionText, feelingRating } = await request.json();
     
     if (!tarotCards || !universalDay || !transit) {
       return NextResponse.json({ error: "Missing required cosmic data" }, { status: 400 });
@@ -35,6 +35,7 @@ Today's cosmic data:
 ${planetaryHour ? `- Current Planetary Hour: ${planetaryHour}` : ''}
 ${personalYear ? `- Personal Year: ${personalYear}, Personal Month: ${personalMonth}, Personal Day: ${personalDay}` : ''}
 ${hermeticPrinciple ? `- Today's Hermetic Principle: ${hermeticPrinciple}` : ''}
+${assumptionText ? `- Today's Living in the End assumption: "${assumptionText}" (feeling: ${feelingRating || '?'}/10)` : ''}
 
 ${geminiSuffix ? `\nUSER SPECIFIC DIRECTIVES: ${geminiSuffix}\n` : ''}
 

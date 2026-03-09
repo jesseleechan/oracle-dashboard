@@ -58,3 +58,28 @@ export async function PUT(request) {
     return NextResponse.json({ error: "Failed to update log" }, { status: 500 });
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const { id, assumptionText, feelingRating, sensoryScript } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing log ID" }, { status: 400 });
+    }
+
+    const updateData = {};
+    if (assumptionText !== undefined) updateData.assumptionText = assumptionText;
+    if (feelingRating !== undefined) updateData.feelingRating = feelingRating;
+    if (sensoryScript !== undefined) updateData.sensoryScript = sensoryScript;
+
+    const updated = await prisma.log.update({
+      where: { id },
+      data: updateData
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error("Failed to patch log:", error);
+    return NextResponse.json({ error: "Failed to patch log" }, { status: 500 });
+  }
+}

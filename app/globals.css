@@ -2462,3 +2462,232 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .sensory-btn.loading, .sats-breathe { animation: none !important; }
 }
+
+/* ============================================= */
+/* LIVING IN THE END TRACKER                     */
+/* ============================================= */
+
+.assumption-widget {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-top: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.at-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.at-header:hover { background: rgba(255,255,255,0.02); }
+
+.at-header-left { display: flex; align-items: center; gap: 12px; }
+
+.at-glyph {
+  font-size: 20px;
+  color: var(--dim);
+  transition: all 0.3s;
+}
+
+.at-glyph.at-glow {
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(201,169,110,0.4);
+  animation: atGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes atGlowPulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.at-header-info { display: flex; flex-direction: column; gap: 2px; }
+
+.at-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.at-sublabel {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.at-header-right { display: flex; align-items: center; gap: 12px; }
+
+.at-rating-badge {
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+/* Body */
+.at-body {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  padding: 20px 16px;
+}
+
+.at-templates {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.at-template-btn {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--dim);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-style: italic;
+}
+
+.at-template-btn:hover {
+  color: var(--gold);
+  border-color: rgba(201,169,110,0.3);
+}
+
+.at-input-area { margin-bottom: 16px; }
+
+.at-prompt-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.at-textarea {
+  width: 100%;
+  min-height: 80px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.at-textarea:focus { outline: none; border-color: rgba(201,169,110,0.3); }
+.at-textarea::placeholder { color: var(--dim); font-style: italic; }
+
+/* Rating */
+.at-rating-section { margin-bottom: 16px; }
+
+.at-rating-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+
+.at-stars { display: flex; gap: 4px; }
+
+.at-star {
+  font-size: 22px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--dim);
+  transition: all 0.15s;
+  padding: 2px;
+}
+
+.at-star.filled { color: var(--muted); }
+.at-star.gold { color: var(--gold); text-shadow: 0 0 8px rgba(201,169,110,0.3); }
+.at-star:hover { transform: scale(1.15); }
+
+/* Actions */
+.at-actions { display: flex; gap: 10px; margin-bottom: 12px; }
+
+.at-save-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: rgba(201,169,110,0.08);
+  border: 1px solid rgba(201,169,110,0.25);
+  border-radius: 4px;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.at-save-btn:hover:not(:disabled) { background: rgba(201,169,110,0.12); }
+.at-save-btn:disabled { opacity: 0.4; cursor: default; }
+
+.at-sats-btn {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--dim);
+  cursor: pointer;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.at-sats-btn:hover { border-color: rgba(201,169,110,0.3); color: var(--gold); }
+
+/* Confirmation */
+.at-confirmation {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--gold);
+  font-style: italic;
+  text-align: center;
+  padding: 12px;
+  opacity: 0.8;
+  animation: atGlowPulse 4s ease-in-out infinite;
+}
+
+/* Gold Burst */
+.at-gold-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.at-gold-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at-glyph.at-glow, .at-confirmation { animation: none !important; }
+  .at-gold-burst { display: none !important; }
+}

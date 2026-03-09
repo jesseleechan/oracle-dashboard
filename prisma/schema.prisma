@@ -24,6 +24,8 @@ model Log {
   revisedScene  String?
   revisedAt     DateTime?
   isImpressed   Boolean   @default(false)
+  assumptionText String?
+  feelingRating  Int?
   sensoryScript String?
   createdAt     DateTime  @default(now())
 }

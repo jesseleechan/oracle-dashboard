@@ -17,6 +17,7 @@ import NavOrbs from '@/components/cosmic/NavOrbs';
 import PlanetaryHours from '@/components/cosmic/PlanetaryHours';
 import NumerologyOracle from '@/components/cosmic/NumerologyOracle';
 import HermeticPrinciple from '@/components/cosmic/HermeticPrinciple';
+import AssumptionTracker from '@/components/cosmic/AssumptionTracker';
 import { getDailyPrinciple } from '@/lib/hermeticPrinciples';
 import { getPersonalNumerology } from '@/lib/personalNumerology';
 import { getPlanetaryHours } from '@/lib/planetaryHours';
@@ -115,7 +116,9 @@ export default function MundaneDashboard() {
           personalYear: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalYear; } return null; } catch { return null; } })(),
           personalMonth: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalMonth; } return null; } catch { return null; } })(),
           personalDay: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalDay; } return null; } catch { return null; } })(),
-          hermeticPrinciple: (() => { try { return getDailyPrinciple()?.name || null; } catch { return null; } })()
+          hermeticPrinciple: (() => { try { return getDailyPrinciple()?.name || null; } catch { return null; } })(),
+          assumptionText: (() => { try { const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}'); return c.date === new Date().toDateString() ? c.text : null; } catch { return null; } })(),
+          feelingRating: (() => { try { const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}'); return c.date === new Date().toDateString() ? c.rating : null; } catch { return null; } })()
         })
       });
 
@@ -272,6 +275,11 @@ export default function MundaneDashboard() {
           <HermeticPrinciple 
             onStartSats={(sceneText) => { setScene(sceneText); setSatsMode(true); }}
             transitColor={null}
+          />
+
+          <AssumptionTracker 
+            onStartSats={(sceneText) => { setScene(sceneText); setSatsMode(true); }}
+            todayLogId={null}
           />
 
           <div className="energy-ratings-container" style={{ paddingTop: '1.5rem', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', minHeight: '380px' }}>
