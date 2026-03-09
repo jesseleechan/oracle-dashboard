@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const CardBack = () => (
   <svg viewBox="0 0 120 200" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: "100%", height: "100%" }}>
@@ -50,7 +51,7 @@ const CardFace = ({ card }) => (
 
 const SPREAD_LABELS = ["Current State", "Friction", "The Anchor"];
 
-export default function TarotStage({ spreadMode, setSpreadMode, visibleCards, fetchCards, flipCard, reshuffle }) {
+export default function TarotStage({ spreadMode, setSpreadMode, visibleCards, fetchCards, flipCard, reshuffle, isRedrawing }) {
   return (
     <section className="section">
       <div className="section-label">The Oracle</div>
@@ -60,17 +61,39 @@ export default function TarotStage({ spreadMode, setSpreadMode, visibleCards, fe
       </div>
 
       <div className="card-stage">
-        {visibleCards.map((card, i) => (
-          <div key={i} className="card-slot">
-            <div className="card-wrapper" onClick={() => flipCard(i)}>
-              <div className={`card-inner ${card.flipped ? 'flipped' : ''}`}>
-                <div className="card-back-side"><CardBack /></div>
-                <div className="card-face" style={{ transform: card.isReversed ? 'rotateY(180deg) rotateZ(180deg)' : 'rotateY(180deg)' }}><CardFace card={card} /></div>
+        {visibleCards.map((card, i) => {
+          const isCups = card.name.includes("Cups");
+          const isWands = card.name.includes("Wands");
+          
+          return (
+            <motion.div
+              key={i}
+              className={`card-slot ${card.flipped ? 'flipped-wrapper' : ''}`}
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.15, duration: 0.5, ease: 'easeOut' }}
+            >
+              <div 
+                className={`card-wrapper ${isRedrawing ? 'fast-fly-back' : ''}`} 
+                onClick={() => flipCard(i)}
+              >
+                <div className={`card-inner ${card.flipped ? 'flipped' : ''} ${card.isReversed ? 'is-reversed' : ''}`}>
+                  <div className="card-back-side"><CardBack /></div>
+                  <div className="card-face">
+                    <div className="card-face-glare"></div>
+                    {isCups && card.flipped && <div className="pip-fx water" />}
+                    {isWands && card.flipped && <div className="pip-fx ember" />}
+                    
+                    <div className="card-svg-container" style={{ transform: card.isReversed ? 'rotateY(180deg) rotateZ(180deg)' : 'rotateY(180deg)', width: '100%', height: '100%' }}>
+                      <CardFace card={card} />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            {spreadMode === 'three' && <div className="card-slot-label">{SPREAD_LABELS[i]}</div>}
-          </div>
-        ))}
+              {spreadMode === 'three' && <div className="card-slot-label">{SPREAD_LABELS[i]}</div>}
+            </motion.div>
+          );
+        })}
       </div>
       
       {visibleCards.length === 1 && visibleCards[0].flipped && (
@@ -80,7 +103,10 @@ export default function TarotStage({ spreadMode, setSpreadMode, visibleCards, fe
          </div>
       )}
 
-      <button className="reshuffle-btn" onClick={reshuffle}>Reshuffle</button>
+      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+        <button className="reshuffle-btn" onClick={reshuffle}>Reshuffle Matrix</button>
+        <button className="reshuffle-btn" onClick={reshuffle} style={{ borderColor: 'rgba(214,106,106,0.3)', color: 'rgba(214,106,106,0.8)' }}>Redo Draw</button>
+      </div>
     </section>
   );
 }

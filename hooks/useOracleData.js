@@ -12,17 +12,37 @@ export function useOracleData() {
   }, []);
 
   async function fetchData() {
-    try {
-      const numRes = await fetch('/api/numerology');
-      const numData = await numRes.json();
-      setNumerology(numData);
+    setTransitLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
 
-      setTransitLoading(true);
-      const astRes = await fetch('/api/astrology');
+    try {
+      const numRes = await fetch('/api/numerology', { signal: controller.signal });
+      const numData = await numRes.json();
+      
+      const astRes = await fetch('/api/astrology', { signal: controller.signal });
       const astData = await astRes.json();
+      
+      clearTimeout(timeoutId);
+      
+      setNumerology(numData);
       setTransitData(astData);
+      
+      // Cache the successful fetch payload for offline use
+      localStorage.setItem('cachedCosmicState', JSON.stringify({ numerology: numData, transit: astData }));
+      
     } catch (e) {
-      console.error(e);
+      console.warn("API Fetch failed, attempting offline cache fallback.", e);
+      const cached = localStorage.getItem('cachedCosmicState');
+      if (cached) {
+         const parsed = JSON.parse(cached);
+         setNumerology(parsed.numerology);
+         setTransitData(parsed.transit);
+      } else {
+         // Failsafe empty state
+         setNumerology({ universalDay: "?" });
+         setTransitData({ transit: { aspect: "Cosmic Static (Offline)", synthesis: "Connection lost to the Oracle." }});
+      }
     } finally {
       setTransitLoading(false);
     }

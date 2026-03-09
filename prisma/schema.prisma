@@ -18,5 +18,8 @@ model Log {
   tarotCards    String
   scene         String
   flowState     String?
+  isRealized    Boolean  @default(false)
+  sceneHistory  String?  
+  reflection    String?
   createdAt     DateTime @default(now())
 }

@@ -11,6 +11,9 @@
   "dependencies": {
     "@google/genai": "^1.44.0",
     "@prisma/client": "5.22.0",
+    "framer-motion": "^12.35.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.0",
     "lucide-react": "^0.577.0",
     "lunarphase-js": "^2.0.3",
     "next": "16.1.6",

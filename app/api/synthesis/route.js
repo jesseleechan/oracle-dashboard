@@ -5,13 +5,13 @@ import { Moon } from 'lunarphase-js';
 
 export async function POST(request) {
   try {
-    const { tarotCards, universalDay, transit } = await request.json();
+    const { tarotCards, universalDay, transit, geminiSuffix, customApiKey, planetaryHour, personalYear, personalMonth, personalDay, hermeticPrinciple } = await request.json();
     
     if (!tarotCards || !universalDay || !transit) {
       return NextResponse.json({ error: "Missing required cosmic data" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = customApiKey || process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });
@@ -32,10 +32,16 @@ Today's cosmic data:
 - Transit: ${transit.aspect}
 - Universal Day Number: ${universalDay}
 - Tarot cards drawn: ${tarotCards}
+${planetaryHour ? `- Current Planetary Hour: ${planetaryHour}` : ''}
+${personalYear ? `- Personal Year: ${personalYear}, Personal Month: ${personalMonth}, Personal Day: ${personalDay}` : ''}
+${hermeticPrinciple ? `- Today's Hermetic Principle: ${hermeticPrinciple}` : ''}
+
+${geminiSuffix ? `\nUSER SPECIFIC DIRECTIVES: ${geminiSuffix}\n` : ''}
 
 Generate generalized, holistic guidance that applies to ${USER_CONSTANTS.name}'s broader life, creativity, and daily rhythms. 
 If multiple tarot cards are drawn, you MUST synthesize the combined narrative of ALL the cards provided in relation to the user's state.
 Use the moon phase (${currentPhase}) to determine the natural workflow rhythm (e.g., Waxing = initiating, Waning = refining/resting), but filter this entirely through the lens of effortless manifestation and allowing the 3D world to catch up to the 4D state.
+${hermeticPrinciple ? `\nWEAVE today's Hermetic Principle (${hermeticPrinciple}) naturally into the synthesis. End with a one-line "Daily Mental Diet" reminder referencing this principle. Make the advice feel like layered ancient wisdom — planetary timing, numerology, tarot, and Hermetic law unified into one living field.` : ''}
 
 Return a strict JSON object with this exact structure:
 - tags: Array of 3 relevant string tags starting with a # (e.g., #Frictionless, #Naturalness, #Allowing)
