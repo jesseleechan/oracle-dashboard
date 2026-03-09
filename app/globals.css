@@ -2887,3 +2887,139 @@ footer {
   line-height: 1.7;
   opacity: 0.85;
 }
+
+/* ============================================= */
+/* NAV ORB 6TH POSITION                          */
+/* ============================================= */
+
+.nav-orb-ml { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); }
+
+/* ============================================= */
+/* TREE OF LIFE PATH MAPPER                      */
+/* ============================================= */
+
+.tree-page { min-height: 100vh; }
+
+.tol-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .tol-layout { grid-template-columns: 1fr; }
+}
+
+/* SVG Diagram */
+.tol-diagram {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.tol-svg { width: 100%; height: auto; }
+
+.tol-path-line {
+  stroke: rgba(201, 169, 110, 0.12);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tol-path-line:hover { stroke: rgba(201, 169, 110, 0.4); stroke-width: 2.5; }
+.tol-path-line.selected { stroke: var(--gold); stroke-width: 2.5; }
+.tol-path-line.mapped { stroke: rgba(201, 169, 110, 0.35); stroke-width: 2; }
+
+.tol-sephira-group { cursor: pointer; }
+
+.tol-sephira {
+  fill: rgba(0, 0, 0, 0.6);
+  stroke-width: 1.5;
+  transition: all 0.3s;
+}
+
+.tol-sephira:hover { fill: rgba(201, 169, 110, 0.08); stroke-width: 2.5; }
+.tol-sephira.selected { fill: rgba(201, 169, 110, 0.12); stroke-width: 2.5; }
+.tol-sephira.mapped { fill: rgba(201, 169, 110, 0.06); stroke-width: 2; }
+
+.tol-sephira-label {
+  fill: var(--dim);
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.tol-sephira-pulse {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0;
+  animation: tolPulse 2s ease-out forwards;
+}
+
+@keyframes tolPulse {
+  0% { r: 20; opacity: 0.8; }
+  100% { r: 40; opacity: 0; }
+}
+
+/* Panel */
+.tol-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  min-height: 400px;
+}
+
+.tol-panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 350px;
+  text-align: center;
+  gap: 12px;
+}
+
+.tol-panel-content { display: flex; flex-direction: column; gap: 16px; }
+
+.tol-panel-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.tol-panel-keyword {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--dim);
+  font-style: italic;
+}
+
+.tol-scene-area { margin-top: 8px; }
+
+.tol-mapped-info {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--gold);
+  font-style: italic;
+  opacity: 0.7;
+  padding: 10px 12px;
+  background: rgba(201,169,110,0.04);
+  border-left: 2px solid rgba(201,169,110,0.2);
+  border-radius: 0 4px 4px 0;
+}
+
+.tol-pathworking {
+  padding: 16px;
+  background: rgba(201,169,110,0.03);
+  border-left: 2px solid rgba(201,169,110,0.2);
+  border-radius: 0 4px 4px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tol-sephira-pulse { animation: none !important; }
+}

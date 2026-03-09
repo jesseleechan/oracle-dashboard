@@ -26,6 +26,8 @@ model Log {
   isImpressed   Boolean   @default(false)
   assumptionText String?
   feelingRating  Int?
+  mappedSephira  String?
+  mappedPath     Int?
   sensoryScript String?
   createdAt     DateTime  @default(now())
 }

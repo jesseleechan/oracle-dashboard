@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Settings, Pen, Archive, BookOpen } from 'lucide-react';
+import { Home, Settings, Pen, Archive, BookOpen, Hexagon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -41,6 +41,12 @@ export default function NavOrbs({ synthesisReady }) {
       <Link href="/journal">
         <motion.div className="nav-orb nav-orb-mr" title="Dream Journal" whileHover={{ scale: 1.15 }}>
           <BookOpen size={16} strokeWidth={1.5} />
+        </motion.div>
+      </Link>
+
+      <Link href="/tree">
+        <motion.div className="nav-orb nav-orb-ml" title="Tree of Life" whileHover={{ scale: 1.15 }}>
+          <Hexagon size={16} strokeWidth={1.5} />
         </motion.div>
       </Link>
     </>
