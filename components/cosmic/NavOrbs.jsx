@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Settings, Pen, Archive } from 'lucide-react';
+import { Home, Settings, Pen, Archive, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -27,7 +27,7 @@ export default function NavOrbs({ synthesisReady }) {
       </Link>
       
       <Link href="/settings">
-        <motion.div className={`nav-orb nav-orb-bl ${synthesisReady ? 'pulse-ready' : ''}`} title="Settings / Synthesis" whileHover={{ scale: 1.15 }}>
+        <motion.div className={`nav-orb nav-orb-bl ${synthesisReady ? 'pulse-ready' : ''}`} title="Settings" whileHover={{ scale: 1.15 }}>
           <Settings size={16} strokeWidth={1.5} />
         </motion.div>
       </Link>
@@ -35,6 +35,12 @@ export default function NavOrbs({ synthesisReady }) {
       <Link href="/revision">
         <motion.div className="nav-orb nav-orb-br" title="Revision Chamber" whileHover={{ scale: 1.15 }}>
           <Pen size={16} strokeWidth={1.5} />
+        </motion.div>
+      </Link>
+
+      <Link href="/journal">
+        <motion.div className="nav-orb nav-orb-mr" title="Dream Journal" whileHover={{ scale: 1.15 }}>
+          <BookOpen size={16} strokeWidth={1.5} />
         </motion.div>
       </Link>
     </>

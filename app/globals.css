@@ -2691,3 +2691,199 @@ footer {
   .at-glyph.at-glow, .at-confirmation { animation: none !important; }
   .at-gold-burst { display: none !important; }
 }
+
+/* ============================================= */
+/* NAV ORB 5TH POSITION                          */
+/* ============================================= */
+
+.nav-orb-mr { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); }
+
+/* ============================================= */
+/* DREAM / SYNCHRONICITY JOURNAL                 */
+/* ============================================= */
+
+.journal-page { min-height: 100vh; }
+
+.jn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+}
+
+.jn-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--dim);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Input Card */
+.jn-input-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.jn-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.jn-tab {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: all 0.2s;
+}
+
+.jn-tab.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,169,110,0.06);
+}
+
+.jn-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px;
+  color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+.jn-textarea:focus { outline: none; border-color: rgba(201,169,110,0.3); }
+.jn-textarea::placeholder { color: var(--dim); font-style: italic; }
+
+.jn-analyze-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(201,169,110,0.08);
+  border: 1px solid rgba(201,169,110,0.25);
+  border-radius: 4px;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: 'Inconsolata', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.jn-analyze-btn:hover:not(:disabled) { background: rgba(201,169,110,0.12); }
+.jn-analyze-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Filters */
+.jn-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Entries */
+.jn-entries { display: flex; flex-direction: column; gap: 8px; }
+
+.jn-entry {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  overflow: hidden;
+}
+
+.jn-entry:hover { background: rgba(255,255,255,0.02); }
+.jn-entry.expanded { border-color: rgba(201,169,110,0.2); }
+
+.jn-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.jn-entry-left { display: flex; align-items: center; gap: 12px; }
+.jn-entry-icon { font-size: 18px; }
+
+.jn-entry-date {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+
+.jn-entry-preview {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.jn-entry-type {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* Entry Body */
+.jn-entry-body {
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.jn-entry-content {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.jn-analysis {
+  padding: 16px;
+  background: rgba(201,169,110,0.03);
+  border-left: 2px solid rgba(201,169,110,0.2);
+  border-radius: 0 4px 4px 0;
+}
+
+.jn-analysis-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.jn-analysis-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--gold);
+  font-style: italic;
+  line-height: 1.7;
+  opacity: 0.85;
+}

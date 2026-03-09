@@ -29,3 +29,13 @@ model Log {
   sensoryScript String?
   createdAt     DateTime  @default(now())
 }
+
+model JournalEntry {
+  id              String    @id @default(cuid())
+  type            String    // "dream" or "synchronicity"
+  content         String
+  date            String
+  geminiAnalysis  String?
+  linkedToSceneId String?
+  createdAt       DateTime  @default(now())
+}
