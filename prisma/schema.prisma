@@ -11,15 +11,18 @@ datasource db {
 }
 
 model Log {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   date          String
   universalDay  Int
   transitAspect String
   tarotCards    String
   scene         String
   flowState     String?
-  isRealized    Boolean  @default(false)
+  isRealized    Boolean   @default(false)
   sceneHistory  String?  
   reflection    String?
-  createdAt     DateTime @default(now())
+  revisedScene  String?
+  revisedAt     DateTime?
+  isImpressed   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
 }

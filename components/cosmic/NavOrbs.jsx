@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Settings, Navigation, Archive } from 'lucide-react';
+import { Home, Settings, Pen, Archive } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -32,9 +32,11 @@ export default function NavOrbs({ synthesisReady }) {
         </motion.div>
       </Link>
       
-      <motion.div className="nav-orb nav-orb-br" title="SATS Anchor" whileHover={{ scale: 1.15 }}>
-        <Navigation size={16} strokeWidth={1.5} />
-      </motion.div>
+      <Link href="/revision">
+        <motion.div className="nav-orb nav-orb-br" title="Revision Chamber" whileHover={{ scale: 1.15 }}>
+          <Pen size={16} strokeWidth={1.5} />
+        </motion.div>
+      </Link>
     </>
   );
 }
