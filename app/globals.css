@@ -2327,3 +2327,138 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .rc-confetti-container { display: none !important; }
 }
+
+/* ============================================= */
+/* SENSORY IMAGINATION PROMPTS                   */
+/* ============================================= */
+
+.sensory-toolbar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
+.sensory-suggest {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+.sensory-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sensory-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  min-width: 70px;
+}
+
+.sensory-btn:hover:not(:disabled) {
+  border-color: var(--sense-color);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--sense-color) 30%, transparent);
+  transform: translateY(-2px);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.sensory-btn.suggested {
+  border-color: color-mix(in srgb, var(--sense-color) 40%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--sense-color) 15%, transparent);
+}
+
+.sensory-btn.loading {
+  border-color: var(--sense-color);
+  animation: sensePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sensePulse {
+  0%, 100% { box-shadow: 0 0 8px color-mix(in srgb, var(--sense-color) 20%, transparent); }
+  50% { box-shadow: 0 0 24px color-mix(in srgb, var(--sense-color) 40%, transparent); }
+}
+
+.sensory-btn:disabled { opacity: 0.4; cursor: default; }
+
+.sensory-emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.sensory-btn-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* Sensory Result */
+.sensory-result {
+  margin-top: 24px;
+  padding: 20px 24px;
+  background: rgba(201, 169, 110, 0.04);
+  border-left: 2px solid rgba(201, 169, 110, 0.25);
+  border-radius: 0 6px 6px 0;
+  max-width: 600px;
+}
+
+.sensory-loading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  color: var(--gold);
+  font-style: italic;
+  animation: pulseFade 2s ease-in-out infinite;
+}
+
+.sensory-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--gold);
+  line-height: 1.8;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.sats-breathe {
+  animation: satsSensoryBreathe 8s ease-in-out infinite;
+}
+
+@keyframes satsSensoryBreathe {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .sensory-toolbar { bottom: 16px; }
+  .sensory-btn { padding: 8px 10px; min-width: 56px; }
+  .sensory-emoji { font-size: 16px; }
+  .sensory-btn-label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sensory-btn.loading, .sats-breathe { animation: none !important; }
+}
