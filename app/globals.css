@@ -3023,3 +3023,111 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .tol-sephira-pulse { animation: none !important; }
 }
+
+/* ============================================= */
+/* ESOTERIC CROSS-REFERENCE SYNTHESIS            */
+/* ============================================= */
+
+.synth-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.synth-deepen-btn {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.synth-deepen-btn:hover {
+  color: var(--gold);
+  border-color: rgba(201, 169, 110, 0.4);
+}
+
+.synth-layers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 20px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.synth-layers-label {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-right: 4px;
+}
+
+.synth-layer-badge {
+  font-size: 14px;
+  color: var(--gold);
+  background: rgba(201, 169, 110, 0.05);
+  border: 1px solid rgba(201, 169, 110, 0.15);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  transition: all 0.2s;
+}
+
+.synth-layer-badge:hover {
+  background: rgba(201, 169, 110, 0.15);
+  transform: scale(1.1);
+}
+
+.synth-depth-glow {
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-left: auto;
+  opacity: 0.8;
+  animation: depthGlow 3s ease-in-out infinite;
+}
+
+@keyframes depthGlow {
+  0%, 100% { opacity: 0.5; text-shadow: none; }
+  50% { opacity: 1; text-shadow: 0 0 8px rgba(201, 169, 110, 0.5); }
+}
+
+.unified-insight {
+  position: relative;
+  z-index: 1;
+}
+
+.unified-insight::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle at center, rgba(201, 169, 110, 0.03) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+  animation: unifiedBreathe 8s ease-in-out infinite;
+}
+
+@keyframes unifiedBreathe {
+  0%, 100% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .synth-depth-glow, .unified-insight::before { animation: none !important; }
+}

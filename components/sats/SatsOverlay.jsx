@@ -18,7 +18,7 @@ const PLANET_SENSE_MAP = {
   'Sun': 'sight', 'Mercury': 'hearing', 'Moon': 'smell', 'Saturn': 'touch'
 };
 
-export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState }) {
+export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, aiOutput }) {
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
@@ -47,13 +47,13 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState })
 
   // Typewriter effect for main scene
   useEffect(() => {
-    if (satsMode && scene) {
+    if (satsMode) {
       setDisplayedText("");
       setIsTyping(true);
       setSensoryText(null);
       setShowSensory(false);
       let currentIndex = 0;
-      const textToType = scene;
+      const textToType = scene || aiOutput?.insight || "Breathe and assume the wish fulfilled. It is already done.";
       
       typingRef.current = setInterval(() => {
         if (currentIndex < textToType.length) {

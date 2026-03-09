@@ -3,13 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const LOADING_PHRASES = [
   "The ether is listening...",
-  "Synthesizing energetic weather...",
-  "Resistance softens...",
-  "Aligning with cosmic frequencies...",
-  "Transmuting the timeline..."
+  "Weaving planetary threads...",
+  "Aligning the Tree of Life...",
+  "Channeling the unified field...",
+  "The oracle speaks as one voice..."
 ];
 
-export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, generateStudioInsight }) {
+const LAYER_ICONS = {
+  planetary: { icon: '☿', label: 'Planetary Hour' },
+  numerology: { icon: '⑦', label: 'Numerology' },
+  hermetic: { icon: '☤', label: 'Hermetic Law' },
+  tree: { icon: '✡', label: 'Tree of Life' },
+  dream: { icon: '🌙', label: 'Dream/Synch' },
+  assumption: { icon: '◉', label: 'Assumption' },
+  sensory: { icon: '✋', label: 'Sensory Script' }
+};
+
+export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, generateStudioInsight, onDeepen }) {
   const [loadingPhraseIdx, setLoadingPhraseIdx] = useState(0);
 
   useEffect(() => {
@@ -24,15 +34,39 @@ export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, gen
     return () => clearInterval(interval);
   }, [aiLoading]);
 
+  const layers = aiOutput?.layersActive || [];
+  const depth = aiOutput?.depth || 0;
+  const isUnified = depth >= 3;
+
   return (
     <div className={`studio-block ${(aiOutput || aiLoading) ? 'expanded' : ''}`}>
       <div className="studio-header">
-        <div className="section-label" style={{ marginBottom: 0, gap: '8px' }}>Studio Synthesis</div>
-        <button className="generate-btn" onClick={generateStudioInsight} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
-          {aiLoading ? "Synthesizing..." : (aiOutput ? "Refresh Synthesis" : "Translate to Action")}
-        </button>
+        <div className="section-label" style={{ marginBottom: 0, gap: '8px' }}>
+          {isUnified ? '✦ Unified Oracle' : 'Studio Synthesis'}
+        </div>
+        <div className="synth-header-actions">
+          {aiOutput && !aiLoading && onDeepen && (
+            <button className="synth-deepen-btn" onClick={onDeepen}>Deepen</button>
+          )}
+          <button className="generate-btn" onClick={generateStudioInsight} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
+            {aiLoading ? "Synthesizing..." : (aiOutput ? "Refresh" : "Translate to Action")}
+          </button>
+        </div>
       </div>
       
+      {/* Layers Active Badges */}
+      {aiOutput && layers.length > 0 && (
+        <div className="synth-layers">
+          <span className="synth-layers-label">Layers:</span>
+          {layers.map(layer => (
+            <span key={layer} className="synth-layer-badge" title={LAYER_ICONS[layer]?.label}>
+              {LAYER_ICONS[layer]?.icon || '•'}
+            </span>
+          ))}
+          {depth >= 4 && <span className="synth-depth-glow">Full Alignment</span>}
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
       {aiLoading ? (
         <motion.div
@@ -62,7 +96,7 @@ export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, gen
           <div className="studio-tags">
             {aiOutput.tags && Array.isArray(aiOutput.tags) ? aiOutput.tags.map(tag => <span key={tag} className="tag">{tag}</span>) : null}
           </div>
-          <div className="studio-insight" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{aiOutput.insight}</div>
+          <div className={`studio-insight ${isUnified ? 'unified-insight' : ''}`} style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>{aiOutput.insight}</div>
         </motion.div>
       ) : null}
       </AnimatePresence>

@@ -5,14 +5,22 @@ import { Moon } from 'lunarphase-js';
 
 export async function POST(request) {
   try {
-    const { tarotCards, universalDay, transit, geminiSuffix, customApiKey, planetaryHour, personalYear, personalMonth, personalDay, hermeticPrinciple, assumptionText, feelingRating } = await request.json();
+    const {
+      tarotCards, universalDay, transit, geminiSuffix, customApiKey,
+      planetaryHour, personalYear, personalMonth, personalDay, yearArchetype,
+      hermeticPrinciple, hermeticAxiom,
+      assumptionText, feelingRating,
+      mappedSephira, mappedPath,
+      dreamInsight, synchronicityInsight,
+      sensoryScript,
+      deepen
+    } = await request.json();
     
     if (!tarotCards || !universalDay || !transit) {
       return NextResponse.json({ error: "Missing required cosmic data" }, { status: 400 });
     }
 
     const apiKey = customApiKey || process.env.GEMINI_API_KEY;
-
     if (!apiKey) {
       return NextResponse.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });
     }
@@ -20,35 +28,53 @@ export async function POST(request) {
     const ai = new GoogleGenAI({ apiKey });
     const currentPhase = Moon.lunarPhase();
 
-    const prompt = `You are a holistic esoteric advisor for a creative entrepreneur named ${USER_CONSTANTS.name}. 
-Profession: ${USER_CONSTANTS.profession}.
+    // Count active layers for depth tracking
+    const layers = [];
+    if (planetaryHour) layers.push('planetary');
+    if (personalYear) layers.push('numerology');
+    if (hermeticPrinciple) layers.push('hermetic');
+    if (mappedSephira || mappedPath) layers.push('tree');
+    if (dreamInsight || synchronicityInsight) layers.push('dream');
+    if (assumptionText) layers.push('assumption');
+    if (sensoryScript) layers.push('sensory');
+    const depth = layers.length;
 
-CORE PHILOSOPHY: YOU MUST STRICTLY APPLY NEVILLE GODDARD'S "LAW OF REVERSE EFFORT".
-You are absolutely forbidden from advising "hustling," "grinding," "pushing through," "trying harder," or "forcing" an outcome. 
-Instead, you must advise on how to release resistance, assume the feeling of the wish fulfilled (the state of "naturalness"), and act from a place of relaxed certainty. Remind the user that success is already an established, mundane fact. The daily work (designing, living, creating) is simply the calm aftermath of that success.
+    const prompt = `You are a unified esoteric oracle for ${USER_CONSTANTS.name}, a ${USER_CONSTANTS.profession}.
 
-Today's cosmic data:
+CORE LAW: NEVILLE GODDARD'S "LAW OF REVERSE EFFORT" — never advise hustling, grinding, or forcing. All guidance flows from the feeling of the wish fulfilled, calm certainty, and natural allowing. Success is already an established fact.
+
+TODAY'S COSMIC FIELD:
 - Moon Phase: ${currentPhase}
 - Transit: ${transit.aspect}
 - Universal Day Number: ${universalDay}
-- Tarot cards drawn: ${tarotCards}
-${planetaryHour ? `- Current Planetary Hour: ${planetaryHour}` : ''}
-${personalYear ? `- Personal Year: ${personalYear}, Personal Month: ${personalMonth}, Personal Day: ${personalDay}` : ''}
-${hermeticPrinciple ? `- Today's Hermetic Principle: ${hermeticPrinciple}` : ''}
-${assumptionText ? `- Today's Living in the End assumption: "${assumptionText}" (feeling: ${feelingRating || '?'}/10)` : ''}
+- Tarot drawn: ${tarotCards}
+${planetaryHour ? `- Planetary Hour: ${planetaryHour} (channel this planet's energy)` : ''}
+${personalYear ? `- Personal Year ${personalYear}${yearArchetype ? ` — ${yearArchetype}` : ''}, Month ${personalMonth}, Day ${personalDay}` : ''}
+${hermeticPrinciple ? `- Hermetic Principle: ${hermeticPrinciple}${hermeticAxiom ? ` — "${hermeticAxiom}"` : ''}` : ''}
+${mappedSephira ? `- Tree of Life: Scene mapped to ${mappedSephira}` : ''}${mappedPath ? `- Tree of Life: Scene on Path ${mappedPath}` : ''}
+${dreamInsight ? `- Morning dream wisdom: "${dreamInsight}"` : ''}
+${synchronicityInsight ? `- Synchronicity noted: "${synchronicityInsight}"` : ''}
+${assumptionText ? `- Living in the End: "${assumptionText}" (feeling: ${feelingRating || '?'}/10)` : ''}
+${sensoryScript ? `- Active sensory script: "${sensoryScript.substring(0, 100)}"` : ''}
 
-${geminiSuffix ? `\nUSER SPECIFIC DIRECTIVES: ${geminiSuffix}\n` : ''}
+${geminiSuffix ? `USER DIRECTIVES: ${geminiSuffix}\n` : ''}
 
-Generate generalized, holistic guidance that applies to ${USER_CONSTANTS.name}'s broader life, creativity, and daily rhythms. 
-If multiple tarot cards are drawn, you MUST synthesize the combined narrative of ALL the cards provided in relation to the user's state.
-Use the moon phase (${currentPhase}) to determine the natural workflow rhythm (e.g., Waxing = initiating, Waning = refining/resting), but filter this entirely through the lens of effortless manifestation and allowing the 3D world to catch up to the 4D state.
-${hermeticPrinciple ? `\nWEAVE today's Hermetic Principle (${hermeticPrinciple}) naturally into the synthesis. End with a one-line "Daily Mental Diet" reminder referencing this principle. Make the advice feel like layered ancient wisdom — planetary timing, numerology, tarot, and Hermetic law unified into one living field.` : ''}
+SYNTHESIS INSTRUCTIONS:
+${depth >= 4 ? `ALL LAYERS ARE ACTIVE (${depth}). This is a moment of deep alignment. The synthesis must feel like ONE LIVING VOICE from the cosmos — not a list of disconnected readings.` : ''}
+Weave every active influence into a single poetic, hypnotic message. Speak directly to the subconscious. 
+- Paragraph 1: The cosmic weather — moon, transit, planetary hour, and numerological timing unified into one flowing narrative
+- Paragraph 2: Tarot synthesis filtered through the Hermetic Principle and Tree of Life mapping (if present), connected to the Living in the End assumption and any dream/synchronicity wisdom
+${deepen ? '- Go DEEPER: emphasize the Tree of Life + Dream layers. Make the pathworking connection explicit and the dream symbols vivid.' : ''}
+- End with one gentle SATS suggestion or action for tonight
+- Tone: mysterious, precise, deeply personal, matter-of-fact about fulfillment
+- NEVER sound like a list. This must flow like a single channeled transmission.
 
-Return a strict JSON object with this exact structure:
-- tags: Array of 3 relevant string tags starting with a # (e.g., #Frictionless, #Naturalness, #Allowing)
-- insight: A 2-3 sentence practical but holistic directive based on the transits and moon phase, strictly enforcing the Law of Reverse Effort.
-- energyRatings: An array of exactly 8 objects, scoring the following categories strictly with the rating "Strong", "Active", or "Light":
-  Categories: Career Ambition, Spiritual Attunement, Financial Resources, Mental Flow, Emotional State, Social Connection, Physical Vitality, Romantic Charge`;
+Return a strict JSON object:
+- tags: 3 relevant # tags
+- insight: The full 2-paragraph unified oracle (separate with \\n)
+- energyRatings: 8 objects scoring { category, rating } — categories: Career Ambition, Spiritual Attunement, Financial Resources, Mental Flow, Emotional State, Social Connection, Physical Vitality, Romantic Charge — ratings: "Strong", "Active", or "Light"
+- layersActive: ${JSON.stringify(layers)}
+- depth: ${depth}`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -65,7 +91,7 @@ Return a strict JSON object with this exact structure:
             },
             insight: {
               type: Type.STRING,
-              description: "A detailed, elegantly written 2-paragraph reading. Paragraph 1: The cosmic and numerological weather. Paragraph 2: A synthesis of ALL drawn tarot cards, filtered strictly through the Law of Reverse Effort. Separate paragraphs with a newline character (\\n)."
+              description: "A detailed 2-paragraph unified oracle reading. Separate paragraphs with newline."
             },
             energyRatings: {
               type: Type.ARRAY,
@@ -85,6 +111,9 @@ Return a strict JSON object with this exact structure:
     });
 
     const parsed = JSON.parse(response.text);
+    // Attach layer metadata
+    parsed.layersActive = layers;
+    parsed.depth = depth;
     return NextResponse.json(parsed);
   } catch (error) {
     console.error("Synthesis generation failed:", error);

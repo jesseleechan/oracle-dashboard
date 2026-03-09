@@ -96,12 +96,55 @@ export default function MundaneDashboard() {
     }, 600);
   }
 
-  async function generateStudioInsight() {
+  async function generateStudioInsight(deepenMode = false) {
     setAiLoading(true);
     setAiOutput(null);
     try {
       const geminiSuffix = localStorage.getItem('geminiSuffix') || '';
       const customApiKey = localStorage.getItem('customApiKey') || '';
+
+      // Gather all cross-reference layers
+      let planetaryHour = null, personalYear = null, personalMonth = null, personalDay = null, yearArchetype = null;
+      let hermeticPrinciple = null, hermeticAxiom = null;
+      let assumptionText = null, feelingRating = null;
+      let mappedSephira = null, mappedPath = null;
+      let dreamInsight = null, synchronicityInsight = null, sensoryScript = null;
+
+      try { const ph = getPlanetaryHours(); planetaryHour = ph?.hours[ph?.currentIdx]?.planet || null; } catch {}
+      try {
+        const bm = parseInt(localStorage.getItem('birthMonth'));
+        const bd = parseInt(localStorage.getItem('birthDay'));
+        if (bm && bd) {
+          const n = getPersonalNumerology(bm, bd);
+          personalYear = n?.personalYear; personalMonth = n?.personalMonth; personalDay = n?.personalDay;
+          yearArchetype = n?.yearArchetype || null;
+        }
+      } catch {}
+      try {
+        const p = getDailyPrinciple();
+        hermeticPrinciple = p?.name || null;
+        hermeticAxiom = p?.axiom || null;
+      } catch {}
+      try {
+        const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}');
+        if (c.date === new Date().toDateString()) { assumptionText = c.text; feelingRating = c.rating; }
+      } catch {}
+      try {
+        const tm = JSON.parse(localStorage.getItem('treeMappings') || '{}');
+        const firstMapped = Object.entries(tm).find(([k, v]) => v.date === new Date().toDateString());
+        if (firstMapped) {
+          if (firstMapped[0].startsWith('s_')) mappedSephira = firstMapped[0].replace('s_', '');
+          else if (firstMapped[0].startsWith('p_')) mappedPath = parseInt(firstMapped[0].replace('p_', ''));
+        }
+      } catch {}
+      try {
+        const lastDream = localStorage.getItem('lastDreamInsight');
+        if (lastDream) dreamInsight = lastDream;
+      } catch {}
+      try {
+        const cached = localStorage.getItem(`sensory_sight_${(scene || '').substring(0, 50)}`);
+        if (cached) sensoryScript = cached;
+      } catch {}
 
       const response = await fetch('/api/synthesis', {
         method: 'POST',
@@ -110,15 +153,13 @@ export default function MundaneDashboard() {
           tarotCards: visibleCards.map(c => `${c.name} (${c.isReversed ? 'Reversed' : 'Upright'})`),
           universalDay: numerology.universalDay,
           transit: transitData?.transit,
-          geminiSuffix,
-          customApiKey,
-          planetaryHour: (() => { try { const ph = getPlanetaryHours(); return ph?.hours[ph?.currentIdx]?.planet || null; } catch { return null; } })(),
-          personalYear: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalYear; } return null; } catch { return null; } })(),
-          personalMonth: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalMonth; } return null; } catch { return null; } })(),
-          personalDay: (() => { try { const bm = parseInt(localStorage.getItem('birthMonth')); const bd = parseInt(localStorage.getItem('birthDay')); if (bm && bd) { const n = getPersonalNumerology(bm, bd); return n?.personalDay; } return null; } catch { return null; } })(),
-          hermeticPrinciple: (() => { try { return getDailyPrinciple()?.name || null; } catch { return null; } })(),
-          assumptionText: (() => { try { const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}'); return c.date === new Date().toDateString() ? c.text : null; } catch { return null; } })(),
-          feelingRating: (() => { try { const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}'); return c.date === new Date().toDateString() ? c.rating : null; } catch { return null; } })()
+          geminiSuffix, customApiKey,
+          planetaryHour, personalYear, personalMonth, personalDay, yearArchetype,
+          hermeticPrinciple, hermeticAxiom,
+          assumptionText, feelingRating,
+          mappedSephira, mappedPath,
+          dreamInsight, synchronicityInsight, sensoryScript,
+          deepen: deepenMode
         })
       });
 
@@ -196,7 +237,7 @@ export default function MundaneDashboard() {
 
   return (
     <>
-      <SatsOverlay satsMode={satsMode} setSatsMode={setSatsMode} scene={scene} flowState={flowState} />
+      <SatsOverlay satsMode={satsMode} setSatsMode={setSatsMode} scene={scene} flowState={flowState} aiOutput={aiOutput} />
       <NavOrbs synthesisReady={!!aiOutput} />
 
       <StarfieldProvider transitData={transitData} flowState={flowState}>
@@ -338,7 +379,8 @@ export default function MundaneDashboard() {
               aiOutput={aiOutput} 
               aiLoading={aiLoading} 
               visibleCards={visibleCards} 
-              generateStudioInsight={generateStudioInsight} 
+              generateStudioInsight={generateStudioInsight}
+              onDeepen={() => generateStudioInsight(true)}
             />
 
             <div className="goddard-block">
