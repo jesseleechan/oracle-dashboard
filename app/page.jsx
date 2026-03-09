@@ -18,6 +18,7 @@ import PlanetaryHours from '@/components/cosmic/PlanetaryHours';
 import NumerologyOracle from '@/components/cosmic/NumerologyOracle';
 import HermeticPrinciple from '@/components/cosmic/HermeticPrinciple';
 import AssumptionTracker from '@/components/cosmic/AssumptionTracker';
+import AsteroidWhispers from '@/components/cosmic/AsteroidWhispers';
 import { getDailyPrinciple } from '@/lib/hermeticPrinciples';
 import { getPersonalNumerology } from '@/lib/personalNumerology';
 import { getPlanetaryHours } from '@/lib/planetaryHours';
@@ -145,6 +146,15 @@ export default function MundaneDashboard() {
         const cached = localStorage.getItem(`sensory_sight_${(scene || '').substring(0, 50)}`);
         if (cached) sensoryScript = cached;
       } catch {}
+      try {
+        const cachedA = localStorage.getItem('asteroidWhispers');
+        if (cachedA) {
+          const parsed = JSON.parse(cachedA);
+          if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
+            // We pass the insights directly into the synthesis
+          }
+        }
+      } catch {}
 
       const response = await fetch('/api/synthesis', {
         method: 'POST',
@@ -159,6 +169,7 @@ export default function MundaneDashboard() {
           assumptionText, feelingRating,
           mappedSephira, mappedPath,
           dreamInsight, synchronicityInsight, sensoryScript,
+          asteroidWisdom: (() => { try { const a = JSON.parse(localStorage.getItem('asteroidWhispers')||'{}'); return (a.date === new Date().toDateString()) ? a.whispers : null; } catch { return null; } })(),
           deepen: deepenMode
         })
       });
@@ -321,6 +332,11 @@ export default function MundaneDashboard() {
           <AssumptionTracker 
             onStartSats={(sceneText) => { setScene(sceneText); setSatsMode(true); }}
             todayLogId={null}
+          />
+
+          <AsteroidWhispers 
+            isExpanded={baselineExpanded} 
+            transitAspect={transitData?.transit?.aspect}
           />
 
           <div className="energy-ratings-container" style={{ paddingTop: '1.5rem', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', minHeight: '380px' }}>

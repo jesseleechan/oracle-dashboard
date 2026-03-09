@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(request) {
   try {
-    const { scene, sephira, pathNumber, planetaryHour, hermeticPrinciple, personalYear } = await request.json();
+    const { scene, sephira, pathNumber, planetaryHour, hermeticPrinciple, personalYear, asteroidInsight } = await request.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -24,6 +24,7 @@ SCENE: "${scene}"
 ${planetaryHour ? `Current Planetary Hour: ${planetaryHour}` : ''}
 ${hermeticPrinciple ? `Today's Hermetic Principle: ${hermeticPrinciple}` : ''}
 ${personalYear ? `Personal Year: ${personalYear}` : ''}
+${asteroidInsight ? `Asteroid Influence: ${asteroidInsight}` : ''}
 
 Rules:
 - Guide the imagination to assume the wish fulfilled using the specific energy of ${location}

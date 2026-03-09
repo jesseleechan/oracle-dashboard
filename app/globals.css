@@ -3131,3 +3131,115 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .synth-depth-glow, .unified-insight::before { animation: none !important; }
 }
+
+/* ============================================= */
+/* ASTEROID WHISPERER                            */
+/* ============================================= */
+
+.asteroid-whispers-container {
+  overflow: hidden;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.asteroid-header {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.asteroid-header span {
+  font-family: 'Inconsolata', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.asteroid-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.asteroid-card {
+  padding: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.asteroid-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--gold);
+  opacity: 0.3;
+}
+
+.asteroid-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.asteroid-symbol {
+  font-size: 14px;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.asteroid-name {
+  font-family: 'Inconsolata', monospace;
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.asteroid-transit {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--dim);
+  font-style: italic;
+}
+
+.sats-potent-tag {
+  margin-left: auto;
+  font-family: 'Inconsolata', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rose);
+  background: rgba(214, 106, 106, 0.1);
+  padding: 2px 6px;
+  border-radius: 2px;
+  animation: depthGlow 3s infinite;
+}
+
+.asteroid-insight {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--gold);
+  opacity: 0.8;
+  line-height: 1.5;
+  padding-left: 22px;
+}
+
+.asteroid-loading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--dim);
+  font-style: italic;
+  padding: 12px;
+  animation: pulseFade 2s infinite;
+}

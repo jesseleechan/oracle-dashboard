@@ -11,6 +11,7 @@ export default function SettingsPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [birthdate, setBirthdate] = useState('');
+  const [showAsteroidWhisperer, setShowAsteroidWhisperer] = useState('true');
 
   useEffect(() => {
     // Hydrate from localStorage
@@ -18,11 +19,13 @@ export default function SettingsPage() {
     const pattern = localStorage.getItem('breathingPattern');
     const suffix = localStorage.getItem('geminiSuffix');
     const key = localStorage.getItem('customApiKey');
+    const asteroids = localStorage.getItem('showAsteroidWhisperer');
 
     if (density) setStarfieldDensity(density);
     if (pattern) setBreathingPattern(pattern);
     if (suffix) setGeminiSuffix(suffix);
     if (key) setApiKey(key);
+    if (asteroids) setShowAsteroidWhisperer(asteroids);
 
     // Birthdate
     const bm = localStorage.getItem('birthMonth');
@@ -38,6 +41,7 @@ export default function SettingsPage() {
     localStorage.setItem('breathingPattern', breathingPattern);
     localStorage.setItem('geminiSuffix', geminiSuffix);
     localStorage.setItem('customApiKey', apiKey);
+    localStorage.setItem('showAsteroidWhisperer', showAsteroidWhisperer);
 
     // Save birthdate parts
     if (birthdate) {
@@ -142,6 +146,18 @@ export default function SettingsPage() {
                 <option value="4-7-8">Neville 4-7-8 (Deep Reset)</option>
                 <option value="Box">Box Breathing (Symmetrical)</option>
                 <option value="Disabled">Disabled</option>
+              </select>
+            </div>
+
+            <div style={{ marginTop: '24px' }}>
+              <label style={{ display: 'block', fontFamily: 'Inconsolata', fontSize: '11px', color: 'var(--rose)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Asteroid Whisperer (Chiron, Lilith, Juno, etc.)</label>
+              <select 
+                value={showAsteroidWhisperer} 
+                onChange={e => setShowAsteroidWhisperer(e.target.value)}
+                style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 12px', fontFamily: 'Inconsolata', fontSize: '12px' }}
+              >
+                <option value="true">Enabled (Whispers in Cosmic Baseline)</option>
+                <option value="false">Disabled</option>
               </select>
             </div>
 

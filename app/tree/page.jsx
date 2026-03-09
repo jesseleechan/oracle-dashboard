@@ -15,6 +15,7 @@ export default function TreePage() {
   const [generating, setGenerating] = useState(false);
   const [mappedNodes, setMappedNodes] = useState({});
   const [animatingPath, setAnimatingPath] = useState(null);
+  const [asteroidData, setAsteroidData] = useState(null);
 
   // Load cached mappings
   useEffect(() => {
@@ -29,6 +30,16 @@ export default function TreePage() {
       if (cached) {
         const p = JSON.parse(cached);
         if (p.date === new Date().toDateString() && p.text) setScene(p.text);
+      }
+    } catch {}
+
+    try {
+      const aData = localStorage.getItem('asteroidWhispers');
+      if (aData) {
+        const parsed = JSON.parse(aData);
+        if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
+          setAsteroidData(parsed.whispers[0]);
+        }
       }
     } catch {}
   }, []);
@@ -77,7 +88,8 @@ export default function TreePage() {
           scene,
           sephira: selected.type === 'sephira' ? selected.data.name : null,
           pathNumber: selected.type === 'path' ? selected.data.number : null,
-          planetaryHour, hermeticPrinciple, personalYear
+          planetaryHour, hermeticPrinciple, personalYear,
+          asteroidInsight: asteroidData ? `${asteroidData.name} - ${asteroidData.insight}` : null
         })
       });
       const data = await res.json();
@@ -159,6 +171,12 @@ export default function TreePage() {
                 <div className="tol-panel-keyword">
                   {selected.type === 'sephira' ? selected.data.keyword : `${selected.data.from} → ${selected.data.to}`}
                 </div>
+
+                {asteroidData && (
+                  <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(214,106,106,0.1)', borderRadius: '4px', borderLeft: '2px solid var(--rose)', fontFamily: 'Cormorant Garamond', fontSize: '13px', color: 'var(--text)' }}>
+                    <span style={{color: 'var(--rose)', fontWeight: 'bold'}}>{asteroidData.name} Influence:</span> {asteroidData.insight}
+                  </div>
+                )}
 
                 {/* Scene Input */}
                 <div className="tol-scene-area">

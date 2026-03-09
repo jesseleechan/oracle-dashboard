@@ -16,7 +16,8 @@ const LAYER_ICONS = {
   tree: { icon: '✡', label: 'Tree of Life' },
   dream: { icon: '🌙', label: 'Dream/Synch' },
   assumption: { icon: '◉', label: 'Assumption' },
-  sensory: { icon: '✋', label: 'Sensory Script' }
+  sensory: { icon: '✋', label: 'Sensory Script' },
+  asteroid: { icon: '⚷', label: 'Asteroid Whisper' }
 };
 
 export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, generateStudioInsight, onDeepen }) {

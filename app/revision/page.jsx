@@ -18,6 +18,7 @@ export default function RevisionChamber() {
   const [impressed, setImpressed] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
+  const [asteroidData, setAsteroidData] = useState(null);
   const autoSaveRef = useRef(null);
 
   const fetchScenes = useCallback(async () => {
@@ -33,7 +34,18 @@ export default function RevisionChamber() {
     }
   }, [filter]);
 
-  useEffect(() => { fetchScenes(); }, [fetchScenes]);
+  useEffect(() => { 
+    fetchScenes(); 
+    try {
+      const aData = localStorage.getItem('asteroidWhispers');
+      if (aData) {
+        const parsed = JSON.parse(aData);
+        if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
+          setAsteroidData(parsed.whispers[0]);
+        }
+      }
+    } catch {}
+  }, [fetchScenes]);
 
   // Auto-save draft every 10 seconds
   useEffect(() => {
@@ -58,7 +70,7 @@ export default function RevisionChamber() {
     setShowConfetti(false);
   };
 
-  const handleGenerateRevision = async () => {
+  const handleGenerateRevision = async (useAsteroid = false) => {
     if (!selectedScene) return;
     setGenerating(true);
     try {
@@ -76,7 +88,8 @@ export default function RevisionChamber() {
           originalScene: selectedScene.scene,
           hermeticPrinciple: principle?.name,
           personalYear: numData?.personalYear,
-          planetaryHour
+          planetaryHour,
+          asteroidInsight: useAsteroid && asteroidData ? `${asteroidData.name} - ${asteroidData.insight}` : null
         })
       });
       const data = await res.json();
@@ -230,13 +243,25 @@ export default function RevisionChamber() {
                   <div className="rc-actions">
                     <button
                       className="rc-generate-btn"
-                      onClick={handleGenerateRevision}
+                      onClick={() => handleGenerateRevision(false)}
                       disabled={generating}
                     >
                       {generating ? '✦ Channeling revised scene...' : '✦ Generate Revised Version with Wisdom'}
                     </button>
+                    {asteroidData && (
+                      <button
+                        className="rc-generate-btn"
+                        style={{ marginTop: '8px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--gold)' }}
+                        onClick={() => handleGenerateRevision(true)}
+                        disabled={generating}
+                        title={`Injects ${asteroidData.name} shadow/healing influence into the revision`}
+                      >
+                        ⚷ Heal this with {asteroidData.name}
+                      </button>
+                    )}
                     <button
                       className="rc-impress-btn"
+                      style={{ marginTop: asteroidData ? '16px' : '0' }}
                       onClick={handleImpress}
                       disabled={impressing || !revisedText}
                     >

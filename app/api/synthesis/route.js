@@ -13,6 +13,7 @@ export async function POST(request) {
       mappedSephira, mappedPath,
       dreamInsight, synchronicityInsight,
       sensoryScript,
+      asteroidWisdom,
       deepen
     } = await request.json();
     
@@ -37,6 +38,7 @@ export async function POST(request) {
     if (dreamInsight || synchronicityInsight) layers.push('dream');
     if (assumptionText) layers.push('assumption');
     if (sensoryScript) layers.push('sensory');
+    if (asteroidWisdom && asteroidWisdom.length > 0) layers.push('asteroid');
     const depth = layers.length;
 
     const prompt = `You are a unified esoteric oracle for ${USER_CONSTANTS.name}, a ${USER_CONSTANTS.profession}.
@@ -56,15 +58,16 @@ ${dreamInsight ? `- Morning dream wisdom: "${dreamInsight}"` : ''}
 ${synchronicityInsight ? `- Synchronicity noted: "${synchronicityInsight}"` : ''}
 ${assumptionText ? `- Living in the End: "${assumptionText}" (feeling: ${feelingRating || '?'}/10)` : ''}
 ${sensoryScript ? `- Active sensory script: "${sensoryScript.substring(0, 100)}"` : ''}
+${asteroidWisdom && asteroidWisdom.length > 0 ? `- Asteroid Whispers: ${asteroidWisdom.map(a => `${a.name} (${a.transit}): ${a.insight}`).join(' | ')}` : ''}
 
 ${geminiSuffix ? `USER DIRECTIVES: ${geminiSuffix}\n` : ''}
 
 SYNTHESIS INSTRUCTIONS:
 ${depth >= 4 ? `ALL LAYERS ARE ACTIVE (${depth}). This is a moment of deep alignment. The synthesis must feel like ONE LIVING VOICE from the cosmos — not a list of disconnected readings.` : ''}
 Weave every active influence into a single poetic, hypnotic message. Speak directly to the subconscious. 
-- Paragraph 1: The cosmic weather — moon, transit, planetary hour, and numerological timing unified into one flowing narrative
+- Paragraph 1: The cosmic weather — moon, transit, planetary hour, root numerology, and asteroid influences unified into one flowing narrative
 - Paragraph 2: Tarot synthesis filtered through the Hermetic Principle and Tree of Life mapping (if present), connected to the Living in the End assumption and any dream/synchronicity wisdom
-${deepen ? '- Go DEEPER: emphasize the Tree of Life + Dream layers. Make the pathworking connection explicit and the dream symbols vivid.' : ''}
+${deepen ? '- Go DEEPER: emphasize the Tree of Life + Dream + Asteroid shadow layers. Make the pathworking connection explicit and the symbols vivid.' : ''}
 - End with one gentle SATS suggestion or action for tonight
 - Tone: mysterious, precise, deeply personal, matter-of-fact about fulfillment
 - NEVER sound like a list. This must flow like a single channeled transmission.

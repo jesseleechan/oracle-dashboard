@@ -67,12 +67,23 @@ export default function JournalPage() {
       let assumptionText = null;
       try { const c = JSON.parse(localStorage.getItem('assumptionToday') || '{}'); if (c.date === new Date().toDateString()) assumptionText = c.text; } catch {}
 
+      let asteroidInsight = null;
+      try {
+        const aData = localStorage.getItem('asteroidWhispers');
+        if (aData) {
+          const parsed = JSON.parse(aData);
+          if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
+            asteroidInsight = `${parsed.whispers[0].name} - ${parsed.whispers[0].insight}`;
+          }
+        }
+      } catch {}
+
       const res = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: tab, content, analyze: true,
-          planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, assumptionText
+          planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, assumptionText, asteroidInsight
         })
       });
       const data = await res.json();

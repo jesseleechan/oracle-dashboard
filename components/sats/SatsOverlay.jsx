@@ -28,6 +28,8 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
   const [sensoryLoading, setSensoryLoading] = useState(null);
   const [suggestedSense, setSuggestedSense] = useState(null);
   const [showSensory, setShowSensory] = useState(false);
+  const [includeAsteroid, setIncludeAsteroid] = useState(false);
+  const [asteroidData, setAsteroidData] = useState(null);
   const audioRef = useRef(null);
   const typingRef = useRef(null);
 
@@ -41,6 +43,17 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
       if (ph && ph.currentIdx >= 0) {
         const planet = ph.hours[ph.currentIdx].planet;
         setSuggestedSense(PLANET_SENSE_MAP[planet] || 'sight');
+      }
+    } catch {}
+
+    // Check for Asteroid Whispers
+    try {
+      const cachedA = localStorage.getItem('asteroidWhispers');
+      if (cachedA) {
+        const parsed = JSON.parse(cachedA);
+        if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
+          setAsteroidData(parsed.whispers[0]); // Just take the primary one
+        }
       }
     } catch {}
   }, [satsMode]);
@@ -195,6 +208,16 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
         <div className="sats-text">
           {displayedText}
           <span className={`typewriter-cursor ${!isTyping ? 'hidden' : ''}`}>&nbsp;</span>
+          {includeAsteroid && asteroidData && !isTyping && (
+             <motion.div 
+               initial={{ opacity: 0 }} 
+               animate={{ opacity: 1 }} 
+               transition={{ duration: 2 }}
+               style={{ marginTop: '24px', fontSize: '18px', color: 'var(--gold)', fontStyle: 'italic', opacity: 0.8 }}
+             >
+               ✦ {asteroidData.name}: {asteroidData.insight}
+             </motion.div>
+          )}
         </div>
 
         {/* Sensory Expansion Display */}
@@ -240,6 +263,16 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
             </button>
           ))}
         </div>
+        {asteroidData && (
+          <div style={{ marginTop: '12px', textAlign: 'center' }}>
+            <button 
+              onClick={() => setIncludeAsteroid(!includeAsteroid)}
+              style={{ background: 'transparent', border: 'none', color: includeAsteroid ? 'var(--gold)' : 'var(--dim)', fontFamily: 'Inconsolata', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', transition: 'color 0.2s' }}
+            >
+              {includeAsteroid ? '⚷ Asteroid Aura Active' : '⚷ Invoke Asteroid Aura'}
+            </button>
+          </div>
+        )}
       </div>
 
       <audio 
