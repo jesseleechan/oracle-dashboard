@@ -41,7 +41,7 @@ ${hermeticPrinciple ? `- Let the Hermetic Principle of ${hermeticPrinciple} info
 - Return ONLY the sensory description text`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       contents: prompt,
     });
 

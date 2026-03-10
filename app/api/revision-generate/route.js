@@ -36,7 +36,7 @@ ${hermeticPrinciple ? `- Subtly weave in the energy of the Hermetic Principle of
 Return ONLY the revised scene text.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       contents: prompt,
     });
 

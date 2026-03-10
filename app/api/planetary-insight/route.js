@@ -17,7 +17,7 @@ Do NOT start with the planet name. Use language of "assume the feeling", "it is 
 Return ONLY the sentence, no quotes or formatting.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       contents: prompt,
     });
 
