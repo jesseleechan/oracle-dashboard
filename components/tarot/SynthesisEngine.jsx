@@ -50,7 +50,7 @@ export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, gen
           {aiOutput && !aiLoading && onDeepen && (
             <button className="synth-deepen-btn" onClick={onDeepen}>Deepen</button>
           )}
-          <button className="generate-btn" onClick={generateStudioInsight} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
+          <button className="generate-btn" onClick={() => generateStudioInsight()} disabled={aiLoading || visibleCards.some(c => !c.flipped)}>
             {aiLoading ? "Synthesizing..." : (aiOutput ? "Refresh" : "Translate to Action")}
           </button>
         </div>

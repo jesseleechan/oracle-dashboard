@@ -99,6 +99,7 @@ export default function MundaneDashboard() {
   }
 
   async function generateStudioInsight(deepenMode = false) {
+    const isDeepen = typeof deepenMode === 'boolean' ? deepenMode : false;
     setAiLoading(true);
     setAiOutput(null);
     try {
@@ -191,7 +192,7 @@ export default function MundaneDashboard() {
           asteroidWisdom: (() => { try { const a = JSON.parse(localStorage.getItem('asteroidWhispers')||'{}'); return (a.date === new Date().toDateString()) ? a.whispers : null; } catch { return null; } })(),
           ancientStarsInsight,
           dailyPattern,
-          deepen: deepenMode
+          deepen: isDeepen
         })
       });
 
