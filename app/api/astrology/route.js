@@ -98,18 +98,21 @@ export async function GET(request) {
 
       if (response.ok) {
         const data = await response.json();
-        // The API returns an array like [{ name: "Sun", fullDegree: 123.4, ... }]
-        if (data.output && Array.isArray(data.output)) {
-          transitPlanets = data.output.map(p => ({
-            name: p.name || p.planet_name || p.planetName || "Unknown Planet",
-            fullDegree: typeof p.fullDegree === 'number' ? p.fullDegree : p.normDegree || 0
-          }));
-        } else if (Array.isArray(data)) {
-           transitPlanets = data.map(p => ({
-            name: p.name || p.planet_name || p.planetName || "Unknown Planet",
-            fullDegree: typeof p.fullDegree === 'number' ? p.fullDegree : p.normDegree || 0
-           }));
+        const payload = data.output || data;
+        let pArr = [];
+        if (Array.isArray(payload) && payload.length > 0) {
+          const firstObj = payload[0];
+          for (const key in firstObj) {
+            const p = firstObj[key];
+            if (p && typeof p === 'object' && (p.name || p.planet_name || p.planetName)) {
+              pArr.push({
+                name: p.name || p.planet_name || p.planetName || "Unknown Planet",
+                fullDegree: typeof p.fullDegree === 'number' ? p.fullDegree : p.normDegree || 0
+              });
+            }
+          }
         }
+        transitPlanets = pArr;
       }
     }
 

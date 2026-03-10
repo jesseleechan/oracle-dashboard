@@ -146,11 +146,21 @@ export async function POST(request) {
       });
       if (response.ok) {
         const data = await response.json();
-        const arr = Array.isArray(data.output) ? data.output : (Array.isArray(data) ? data : []);
-        transitPlanets = arr.map(p => ({
-          name: p.name || p.planet_name || p.planetName || "Unknown",
-          fullDegree: typeof p.fullDegree === 'number' ? p.fullDegree : p.normDegree || 0
-        }));
+        const payload = data.output || data;
+        let pArr = [];
+        if (Array.isArray(payload) && payload.length > 0) {
+          const firstObj = payload[0];
+          for (const key in firstObj) {
+            const p = firstObj[key];
+            if (p && typeof p === 'object' && (p.name || p.planet_name || p.planetName)) {
+              pArr.push({
+                name: p.name || p.planet_name || p.planetName || "Unknown Planet",
+                fullDegree: typeof p.fullDegree === 'number' ? p.fullDegree : p.normDegree || 0
+              });
+            }
+          }
+        }
+        transitPlanets = pArr;
       }
     }
 
