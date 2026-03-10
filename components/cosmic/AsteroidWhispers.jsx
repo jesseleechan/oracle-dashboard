@@ -13,10 +13,11 @@ const ASTEROID_SYMBOLS = {
   'Black Moon Lilith': '⚸'
 };
 
-export default function AsteroidWhispers({ isExpanded, transitAspect }) {
+export default function AsteroidWhispers({ transitAspect }) {
   const [whispers, setWhispers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAsteroids, setShowAsteroids] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     // Check settings
@@ -73,38 +74,45 @@ export default function AsteroidWhispers({ isExpanded, transitAspect }) {
   if (!showAsteroids) return null;
 
   return (
-    <AnimatePresence>
-      {isExpanded && (
-        <motion.div 
-          className="asteroid-whispers-container"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="asteroid-header">
-            Asteroid Whispers <span>Shadow & Healing</span>
-          </div>
-          
-          <div className="asteroid-grid">
-            {loading ? (
-              <div className="asteroid-loading">Listening to the deeper orbits...</div>
-            ) : whispers.map((whisper, idx) => (
-              <div key={idx} className="asteroid-card">
-                <div className="asteroid-title-row">
-                  <span className="asteroid-symbol">{ASTEROID_SYMBOLS[whisper.name] || '✦'}</span>
-                  <span className="asteroid-name">{whisper.name}</span>
-                  <span className="asteroid-transit">— {whisper.transit}</span>
-                  {whisper.potentForSats && (
-                    <span className="sats-potent-tag" title="Exceptionally potent for SATS manifestation tonight">✦ Potent</span>
-                  )}
+    <div className="bento-card bento-span-6">
+      <div 
+        className="asteroid-header" 
+        onClick={() => setExpanded(!expanded)} 
+        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', padding: '12px 16px', userSelect: 'none', background: 'transparent', borderBottom: expanded ? '1px solid var(--border)' : 'none' }}
+      >
+        <div>Asteroid Whispers <span style={{ opacity: 0.5, fontSize: '10px', marginLeft: '8px' }}>Shadow & Healing</span></div>
+        <span className="ph-expand-icon">{expanded ? '−' : '+'}</span>
+      </div>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div 
+            className="asteroid-body"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="asteroid-grid" style={{ padding: '0 16px 16px', marginTop: '16px' }}>
+              {loading ? (
+                <div className="asteroid-loading">Listening to the deeper orbits...</div>
+              ) : whispers.map((whisper, idx) => (
+                <div key={idx} className="asteroid-card">
+                  <div className="asteroid-title-row">
+                    <span className="asteroid-symbol" style={{ color: 'var(--transit-hue, var(--gold))' }}>{ASTEROID_SYMBOLS[whisper.name] || '✦'}</span>
+                    <span className="asteroid-name">{whisper.name}</span>
+                    <span className="asteroid-transit">— {whisper.transit}</span>
+                    {whisper.potentForSats && (
+                      <span className="sats-potent-tag" title="Exceptionally potent for SATS manifestation tonight">✦ Potent</span>
+                    )}
+                  </div>
+                  <div className="asteroid-insight">{whisper.insight}</div>
                 </div>
-                <div className="asteroid-insight">{whisper.insight}</div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

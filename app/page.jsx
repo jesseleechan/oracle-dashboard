@@ -19,6 +19,7 @@ import NumerologyOracle from '@/components/cosmic/NumerologyOracle';
 import HermeticPrinciple from '@/components/cosmic/HermeticPrinciple';
 import AssumptionTracker from '@/components/cosmic/AssumptionTracker';
 import AsteroidWhispers from '@/components/cosmic/AsteroidWhispers';
+import AncientStars from '@/components/cosmic/AncientStars';
 import { getDailyPrinciple } from '@/lib/hermeticPrinciples';
 import { getPersonalNumerology } from '@/lib/personalNumerology';
 import { getPlanetaryHours } from '@/lib/planetaryHours';
@@ -155,6 +156,24 @@ export default function MundaneDashboard() {
           }
         }
       } catch {}
+      
+      let ancientStarsInsight = null;
+      try {
+        const aStars = localStorage.getItem('ancientStars');
+        if (aStars) {
+          const parsed = JSON.parse(aStars);
+          if (parsed.date === new Date().toDateString() && parsed.data?.insight) {
+            ancientStarsInsight = parsed.data.insight;
+          }
+        }
+      } catch {}
+
+      let dailyPattern = null;
+      try {
+        if (localStorage.getItem('showPatternOracle') !== 'false') {
+           dailyPattern = localStorage.getItem('dailySynthesisPattern');
+        }
+      } catch {}
 
       const response = await fetch('/api/synthesis', {
         method: 'POST',
@@ -170,6 +189,8 @@ export default function MundaneDashboard() {
           mappedSephira, mappedPath,
           dreamInsight, synchronicityInsight, sensoryScript,
           asteroidWisdom: (() => { try { const a = JSON.parse(localStorage.getItem('asteroidWhispers')||'{}'); return (a.date === new Date().toDateString()) ? a.whispers : null; } catch { return null; } })(),
+          ancientStarsInsight,
+          dailyPattern,
           deepen: deepenMode
         })
       });
@@ -339,6 +360,10 @@ export default function MundaneDashboard() {
             transitAspect={transitData?.transit?.aspect}
           />
 
+          <AncientStars 
+            transitHue={themeStyle["--gold"]}
+          />
+
           <div className="energy-ratings-container" style={{ paddingTop: '1.5rem', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', minHeight: '380px' }}>
             <div className="section-label" style={{ fontSize: '14px', marginBottom: '12px' }}>Current Energetic Weather</div>
             
@@ -469,7 +494,7 @@ export default function MundaneDashboard() {
                   className="toggle-btn" 
                   style={{ marginLeft: 'auto', fontSize: '12px', padding: '6px 12px' }}
                   onClick={() => setSatsMode(true)}
-                  disabled={!scene.trim()}
+                  disabled={!scene.trim() && !aiOutput?.insight}
                 >
                   Enter SATS Mode
                 </button>

@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(request) {
   try {
-    const { originalScene, hermeticPrinciple, personalYear, planetaryHour, asteroidInsight } = await request.json();
+    const { originalScene, hermeticPrinciple, personalYear, planetaryHour, asteroidInsight, starsInsight, patternInsight } = await request.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -23,6 +23,8 @@ ${hermeticPrinciple ? `Today's Hermetic Principle: ${hermeticPrinciple}` : ''}
 ${personalYear ? `Personal Year: ${personalYear}` : ''}
 ${planetaryHour ? `Current Planetary Hour: ${planetaryHour}` : ''}
 ${asteroidInsight ? `Asteroid Shadow Influence: ${asteroidInsight} (Use this shadow/healing wisdom to reframe the friction)` : ''}
+${starsInsight ? `Fixed Star/Lunar Mansion Influence: ${starsInsight} (Channel this ancient stellar power to anchor the wish fulfilled)` : ''}
+${patternInsight ? `pinned Oracle MACRO-PATTERN: "${patternInsight}" (Reweave the scene's friction by grounding it strictly in the assumption provided by this pattern.)` : ''}
 
 REWRITE this scene in first person, present tense, as if the desired outcome has ALREADY happened naturally. Apply Neville Goddard's revision technique:
 - Replace friction/resistance with ease and naturalness

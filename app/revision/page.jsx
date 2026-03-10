@@ -19,6 +19,8 @@ export default function RevisionChamber() {
   const [confirmText, setConfirmText] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
   const [asteroidData, setAsteroidData] = useState(null);
+  const [starsData, setStarsData] = useState(null);
+  const [patternData, setPatternData] = useState(null);
   const autoSaveRef = useRef(null);
 
   const fetchScenes = useCallback(async () => {
@@ -43,6 +45,26 @@ export default function RevisionChamber() {
         if (parsed.date === new Date().toDateString() && parsed.whispers?.length) {
           setAsteroidData(parsed.whispers[0]);
         }
+      }
+    } catch {}
+
+    try {
+      const sData = localStorage.getItem('ancientStars');
+      if (sData) {
+        const parsed = JSON.parse(sData);
+        if (parsed.date === new Date().toDateString() && parsed.data?.insight) {
+          setStarsData({
+            name: parsed.data.stars?.[0]?.name || parsed.data.mansion?.name,
+            insight: parsed.data.insight
+          });
+        }
+      }
+    } catch {}
+
+    try {
+      const pData = localStorage.getItem('revisionInjectedPattern');
+      if (pData && localStorage.getItem('showPatternOracle') !== 'false') {
+        setPatternData(pData);
       }
     } catch {}
   }, [fetchScenes]);
@@ -70,7 +92,7 @@ export default function RevisionChamber() {
     setShowConfetti(false);
   };
 
-  const handleGenerateRevision = async (useAsteroid = false) => {
+  const handleGenerateRevision = async (useAsteroid = false, useStars = false, usePattern = false) => {
     if (!selectedScene) return;
     setGenerating(true);
     try {
@@ -89,7 +111,9 @@ export default function RevisionChamber() {
           hermeticPrinciple: principle?.name,
           personalYear: numData?.personalYear,
           planetaryHour,
-          asteroidInsight: useAsteroid && asteroidData ? `${asteroidData.name} - ${asteroidData.insight}` : null
+          asteroidInsight: useAsteroid && asteroidData ? `${asteroidData.name} - ${asteroidData.insight}` : null,
+          starsInsight: useStars && starsData ? `${starsData.name} - ${starsData.insight}` : null,
+          patternInsight: usePattern && patternData ? patternData : null
         })
       });
       const data = await res.json();
@@ -243,20 +267,30 @@ export default function RevisionChamber() {
                   <div className="rc-actions">
                     <button
                       className="rc-generate-btn"
-                      onClick={() => handleGenerateRevision(false)}
+                      onClick={() => handleGenerateRevision(false, false)}
                       disabled={generating}
                     >
                       {generating ? '✦ Channeling revised scene...' : '✦ Generate Revised Version with Wisdom'}
                     </button>
                     {asteroidData && (
                       <button
-                        className="rc-generate-btn"
-                        style={{ marginTop: '8px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--gold)' }}
-                        onClick={() => handleGenerateRevision(true)}
+                        className="rc-generate-btn rc-asteroid-btn"
+                        onClick={() => handleGenerateRevision(true, false, false)}
                         disabled={generating}
                         title={`Injects ${asteroidData.name} shadow/healing influence into the revision`}
                       >
                         ⚷ Heal this with {asteroidData.name}
+                      </button>
+                    )}
+                    {patternData && (
+                      <button
+                        className="rc-generate-btn rc-asteroid-btn"
+                        style={{ borderColor: 'var(--gold)', color: 'var(--gold)' }}
+                        onClick={() => handleGenerateRevision(false, false, true)}
+                        disabled={generating}
+                        title={`Injects the pinned Pattern Oracle wisdom into the revision`}
+                      >
+                        ✦ Reweave with Oracle Pattern
                       </button>
                     )}
                     <button

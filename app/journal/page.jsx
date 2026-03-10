@@ -78,12 +78,23 @@ export default function JournalPage() {
         }
       } catch {}
 
+      let ancientStarsInsight = null;
+      try {
+        const sData = localStorage.getItem('ancientStars');
+        if (sData) {
+          const parsed = JSON.parse(sData);
+          if (parsed.date === new Date().toDateString() && parsed.data?.insight) {
+            ancientStarsInsight = `${parsed.data.stars?.[0]?.name || parsed.data.mansion?.name} - ${parsed.data.insight}`;
+          }
+        }
+      } catch {}
+
       const res = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: tab, content, analyze: true,
-          planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, assumptionText, asteroidInsight
+          planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, assumptionText, asteroidInsight, ancientStarsInsight
         })
       });
       const data = await res.json();

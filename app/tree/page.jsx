@@ -106,7 +106,7 @@ export default function TreePage() {
 
         <header className="jn-header">
           <div>
-            <div className="logo">Tree of <span>Life</span></div>
+            <div className="logo" style={{ color: 'var(--transit-hue, var(--gold))' }}>Tree of <span>Life</span></div>
             <div className="jn-subtitle">Map your desires to the sacred architecture of creation</div>
           </div>
           <Link href="/" className="rc-back-link">← Dashboard</Link>
@@ -128,6 +128,7 @@ export default function TreePage() {
                     x1={from.x} y1={from.y} x2={to.x} y2={to.y}
                     className={`tol-path-line ${isMapped ? 'mapped' : ''} ${selected?.type === 'path' && selected?.data?.number === path.number ? 'selected' : ''}`}
                     onClick={() => handleSelectPath(path)}
+                    style={selected?.type === 'path' && selected?.data?.number === path.number ? { stroke: 'var(--transit-hue, var(--gold))' } : {}}
                   />
                 );
               })}

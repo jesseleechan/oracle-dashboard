@@ -28,7 +28,7 @@ export async function GET(request) {
 // POST: Create journal entry + optional Gemini analysis
 export async function POST(request) {
   try {
-    const { type, content, analyze, planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, tarotCards, assumptionText, asteroidInsight } = await request.json();
+    const { type, content, analyze, planetaryHour, hermeticPrinciple, personalYear, personalMonth, personalDay, tarotCards, assumptionText, asteroidInsight, ancientStarsInsight } = await request.json();
 
     if (!type || !content) {
       return NextResponse.json({ error: "Missing type or content" }, { status: 400 });
@@ -57,6 +57,7 @@ ${personalYear ? `- Personal Year: ${personalYear}, Month: ${personalMonth}, Day
 ${tarotCards ? `- Today's tarot: ${tarotCards}` : ''}
 ${assumptionText ? `- Current Living in the End assumption: "${assumptionText}"` : ''}
 ${asteroidInsight ? `- Asteroid Whisper: ${asteroidInsight}` : ''}
+${ancientStarsInsight ? `- Fixed Star / Lunar Mansion Influence: ${ancientStarsInsight}` : ''}
 
 Interpret this ${typeLabel} through Neville Goddard + esoteric wisdom. 
 - Identify the key archetypal symbols and what they represent

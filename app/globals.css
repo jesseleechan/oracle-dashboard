@@ -3243,3 +3243,36 @@ footer {
   padding: 12px;
   animation: pulseFade 2s infinite;
 }
+
+/* Pattern Oracle Styles */
+@keyframes patternFadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.pattern-card-fade {
+  animation: patternFadeIn 0.8s ease forwards;
+}
+
+.oracle-active {
+  color: var(--gold);
+}
+
+.oracle-starfield-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(14,14,28,0.3) 0%, rgba(8,8,16,0.9) 100%);
+  z-index: 1;
+  pointer-events: none;
+  animation: pulse 8s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.pattern-block {
+  background: rgba(14, 14, 28, 0.6);
+  backdrop-filter: blur(10px);
+}

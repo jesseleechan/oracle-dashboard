@@ -1,29 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useStarfield } from './StarfieldContext';
 
 export default function ReactiveStarfield() {
   const { velocity, hue, density, flowState, aspect } = useStarfield();
-  // Force a fresh <canvas> DOM element whenever core config changes,
-  // so transferControlToOffscreen always gets a clean slate.
-  const [canvasKey, setCanvasKey] = useState(0);
-  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const workerRef = useRef(null);
   const animRef = useRef(null);
-  const offscreenRef = useRef(false);
+  const flowStateRef = useRef(flowState);
 
-  // Bump the key when config that requires rebuild changes
+  // Post flowState updates to worker without rebuilding
   useEffect(() => {
-    setCanvasKey(k => k + 1);
-  }, [velocity, hue, density]);
+    flowStateRef.current = flowState;
+    if (workerRef.current) {
+      workerRef.current.postMessage({ type: 'config', config: { flowState } });
+    }
+  }, [flowState]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    // Check for reduced motion preference
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) return; // Do not render or animate starfield
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Create fresh canvas to bypass StrictMode OffscreenCanvas transfer state lock
+    const canvas = document.createElement('canvas');
+    canvas.className = 'starfield';
+    container.appendChild(canvas);
 
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const workerConfig = { speedMult: velocity, hue, density, flowState };
-    offscreenRef.current = false;
+    const workerConfig = { speedMult: velocity, hue, density, flowState: flowStateRef.current };
 
     // --- Try OffscreenCanvas Worker ---
     if (typeof canvas.transferControlToOffscreen === 'function' && typeof Worker !== 'undefined') {
@@ -31,7 +39,6 @@ export default function ReactiveStarfield() {
         const offscreen = canvas.transferControlToOffscreen();
         const worker = new Worker('/starfield-worker.js');
         workerRef.current = worker;
-        offscreenRef.current = true;
 
         worker.postMessage({ type: 'init', canvas: offscreen, width: w, height: h, config: workerConfig }, [offscreen]);
 
@@ -49,16 +56,23 @@ export default function ReactiveStarfield() {
           window.removeEventListener('mousemove', handleMouseMove);
           window.removeEventListener('mouseleave', handleMouseLeave);
           window.removeEventListener('resize', handleResize);
+          if (container.contains(canvas)) container.removeChild(canvas);
         };
       } catch (err) {
         console.warn("OffscreenCanvas failed, falling back to main thread", err);
-        offscreenRef.current = false;
+        if (workerRef.current) {
+          workerRef.current.terminate();
+          workerRef.current = null;
+        }
       }
     }
 
     // --- Fallback: Main Thread Rendering ---
     const ctx = canvas.getContext("2d");
-    if (!ctx) return; // Safety: if getContext fails for any reason
+    if (!ctx) {
+      if (container.contains(canvas)) container.removeChild(canvas);
+      return; 
+    }
     let cw = canvas.width = w;
     let ch = canvas.height = h;
     const speedMult = velocity;
@@ -110,7 +124,7 @@ export default function ReactiveStarfield() {
         if (s.y < -50) s.y = ch + 50;
         if (s.x < -50) s.x = cw + 50;
         if (s.x > cw + 50) s.x = -50;
-        if (flowState === "Pure Flow") {
+        if (flowStateRef.current === "Pure Flow") {
           let cn = nodes[0], md = Infinity;
           nodes.forEach(n => { const d = Math.hypot(n.x - s.x, n.y - s.y); if (d < md) { md = d; cn = n; } });
           if (md > 40 && md < 300) { s.x += (cn.x - s.x) * 0.005; s.y += (cn.y - s.y) * 0.005; }
@@ -134,20 +148,20 @@ export default function ReactiveStarfield() {
 
     const resize = () => { cw = canvas.width = window.innerWidth; ch = canvas.height = window.innerHeight; };
     window.addEventListener("resize", resize);
+    
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
+      if (container.contains(canvas)) container.removeChild(canvas);
     };
-  }, [canvasKey, flowState]);
+  }, [velocity, hue, density]);
 
-  // Post flowState updates to worker without rebuilding
-  useEffect(() => {
-    if (workerRef.current) {
-      workerRef.current.postMessage({ type: 'config', config: { flowState } });
-    }
-  }, [flowState]);
+  // If reduced motion is preferred, return nothing
+  if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return <div ref={containerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0, background: 'var(--background)' }} />;
+  }
 
-  return <canvas key={canvasKey} ref={canvasRef} className="starfield" />;
+  return <div ref={containerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 0, pointerEvents: 'none' }} />;
 }

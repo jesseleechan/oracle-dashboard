@@ -30,6 +30,10 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
   const [showSensory, setShowSensory] = useState(false);
   const [includeAsteroid, setIncludeAsteroid] = useState(false);
   const [asteroidData, setAsteroidData] = useState(null);
+  const [includeStars, setIncludeStars] = useState(false);
+  const [starsData, setStarsData] = useState(null);
+  const [includePattern, setIncludePattern] = useState(false);
+  const [patternData, setPatternData] = useState(null);
   const audioRef = useRef(null);
   const typingRef = useRef(null);
 
@@ -56,6 +60,28 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
         }
       }
     } catch {}
+
+    // Check for Ancient Stars
+    try {
+      const storedS = localStorage.getItem('ancientStars');
+      if (storedS) {
+        const parsed = JSON.parse(storedS);
+        if (parsed.date === new Date().toDateString() && parsed.data?.insight) {
+          setStarsData({
+            name: parsed.data.stars?.[0]?.name || parsed.data.mansion?.name,
+            insight: parsed.data.insight
+          });
+        }
+      }
+    } catch {}
+
+    // Check for Pattern
+    try {
+      const storedP = localStorage.getItem('satsInjectedPattern');
+      if (storedP && localStorage.getItem('showPatternOracle') !== 'false') {
+         setPatternData(storedP);
+      }
+    } catch {}
   }, [satsMode]);
 
   // Typewriter effect for main scene
@@ -66,7 +92,17 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
       setSensoryText(null);
       setShowSensory(false);
       let currentIndex = 0;
-      const textToType = scene || aiOutput?.insight || "Breathe and assume the wish fulfilled. It is already done.";
+      let textToType = scene || aiOutput?.insight || "Breathe and assume the wish fulfilled. It is already done.";
+      
+      if (includeAsteroid && asteroidData?.insight) {
+         textToType += `\n\n${asteroidData.insight}`;
+      }
+      if (includeStars && starsData?.insight) {
+         textToType += `\n\n✦ ${starsData.insight}`;
+      }
+      if (includePattern && patternData) {
+         textToType += `\n\n✦ Oracle Pattern: ${patternData}`;
+      }
       
       typingRef.current = setInterval(() => {
         if (currentIndex < textToType.length) {
@@ -218,6 +254,16 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
                ✦ {asteroidData.name}: {asteroidData.insight}
              </motion.div>
           )}
+          {includeStars && starsData && !isTyping && (
+             <motion.div 
+               initial={{ opacity: 0 }} 
+               animate={{ opacity: 1 }} 
+               transition={{ duration: 2, delay: 0.5 }}
+               style={{ marginTop: '16px', fontSize: '18px', color: 'var(--gold)', fontStyle: 'italic', opacity: 0.8 }}
+             >
+               ✨ {starsData.name}: {starsData.insight}
+             </motion.div>
+          )}
         </div>
 
         {/* Sensory Expansion Display */}
@@ -263,16 +309,32 @@ export default function SatsOverlay({ satsMode, setSatsMode, scene, flowState, a
             </button>
           ))}
         </div>
-        {asteroidData && (
-          <div style={{ marginTop: '12px', textAlign: 'center' }}>
+        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '16px' }}>
+          {asteroidData && (
             <button 
               onClick={() => setIncludeAsteroid(!includeAsteroid)}
               style={{ background: 'transparent', border: 'none', color: includeAsteroid ? 'var(--gold)' : 'var(--dim)', fontFamily: 'Inconsolata', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', transition: 'color 0.2s' }}
             >
               {includeAsteroid ? '⚷ Asteroid Aura Active' : '⚷ Invoke Asteroid Aura'}
             </button>
-          </div>
-        )}
+          )}
+          {starsData && (
+            <button 
+              onClick={() => setIncludeStars(!includeStars)}
+              style={{ background: 'transparent', border: 'none', color: includeStars ? 'var(--gold)' : 'var(--dim)', fontFamily: 'Inconsolata', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', transition: 'color 0.2s' }}
+            >
+              {includeStars ? '✨ Stellar Alignment Active' : '✨ Align with Stars'}
+            </button>
+          )}
+          {patternData && (
+            <button 
+              onClick={() => setIncludePattern(!includePattern)}
+              style={{ background: 'transparent', border: 'none', color: includePattern ? 'var(--gold)' : 'var(--dim)', fontFamily: 'Inconsolata', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer', transition: 'color 0.2s' }}
+            >
+              {includePattern ? '✦ Oracle Pattern Injected' : '✦ Inject Pinned Pattern'}
+            </button>
+          )}
+        </div>
       </div>
 
       <audio 

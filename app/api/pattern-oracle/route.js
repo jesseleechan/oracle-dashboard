@@ -4,7 +4,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 
 export async function POST(request) {
   try {
-    const { logs } = await request.json();
+    const { logs, journals, timeframe } = await request.json();
     
     if (!logs || !Array.isArray(logs) || logs.length === 0) {
       return NextResponse.json({ error: "Insufficient log data for Pattern Oracle" }, { status: 400 });
@@ -19,27 +19,34 @@ export async function POST(request) {
 
     // Format logs for context efficiency
     const contextualLogData = logs.map(l => 
-      `[${l.date}] Flow: ${l.flowState || 'N/A'} | Transit: ${l.transitAspect || 'N/A'} | Anchor: ${l.tarotCards} | Scene: ${l.scene}`
+      `[${l.date}] Flow: ${l.flowState || 'N/A'} | Transit: ${l.transitAspect || 'N/A'} | Anchor: ${l.tarotCards} | Assumption: ${l.assumptionText || 'N/A'} | Sephira: ${l.mappedSephira || 'N/A'} | Revised: ${l.isImpressed ? 'Yes' : 'No'} | Scene: ${l.scene}`
     ).join('\n');
+
+    const contextualJournalData = journals && journals.length > 0 ? journals.map(j =>
+      `[${j.date}] ${j.type.toUpperCase()}: ${j.content} | Analysis: ${j.geminiAnalysis?.substring(0, 100) || 'None'}`
+    ).join('\n') : "No dream/synchronicity data recorded.";
 
     const prompt = `You are a holistic esoteric advisor for a creative entrepreneur named ${USER_CONSTANTS.name}. 
 Profession: ${USER_CONSTANTS.profession}.
 
 CORE PHILOSOPHY: YOU MUST STRICTLY APPLY NEVILLE GODDARD'S "LAW OF REVERSE EFFORT".
-Analyze the provided log data spanning the last 60 days. Identify recurring atmospheric or psychological patterns.
-Look closely for correlations: Do specific Tarot anchors or Astrological transits frequently precede "Pure Flow" days or "High Friction" states? Are their specific desires in the scenes that keep resurfacing?
+Analyze the provided log and dream journal data spanning the last ${timeframe || 30} days. Identify recurring atmospheric or psychological patterns.
+Look closely for deep esoteric correlations: Do specific Tarot anchors or Astrological transits frequently precede "Pure Flow" days or successful revisions? Do specific Tree of Life mappings (Sephiroth) lead to higher states? What symbols keep showing up in dreams/signs?
 
 Here is the log data:
 ${contextualLogData}
 
-Extract 3 to 5 highly structured, actionable macro-pattern insights. Be poetic but ruthlessly analytical and practical over the data. Warn them if they are slipping into "forcing" rather than "allowing". 
+Here is the journal data (Dreams / Signs):
+${contextualJournalData}
+
+Extract 3 to 5 highly structured, profoundly deep macro-pattern insights. Weave in correlations like: 'Venus transits consistently preceded successful revisions', 'Netzach mappings led to the highest flow states', etc. Speak in poetic, Neville-aligned, non-hustle language. End with one gentle, commanding recommendation for the coming month (e.g. a SATS focus, revision theme, or Tree of Life path).
 
 Return a strict JSON object with this exact structure:
 - patterns: Array of objects, each containing:
-    - title: (String, short punchy title of the pattern)
-    - detail: (String, 1-2 sentences digging into the root of the correlation)
-    - advice: (String, 1 sentence mapped directly to dropping resistance)
-- synthesis: (String, A 1 paragraph concluding summary of their trajectory)`;
+    - title: (String, short punchy poetic title of the pattern)
+    - detail: (String, 2-3 sentences digging into the root of the correlation, referencing specific cosmic transits, stars, or tarot where applicable)
+    - guidance: (String, 1 concise sentence offering an actionable Neville Goddard assumption)
+- synthesis: (String, A 1 paragraph concluding summary of their trajectory and the recommended focus for next month)`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite-preview",
@@ -56,9 +63,9 @@ Return a strict JSON object with this exact structure:
                 properties: {
                   title: { type: Type.STRING },
                   detail: { type: Type.STRING },
-                  advice: { type: Type.STRING }
+                  guidance: { type: Type.STRING }
                 },
-                required: ["title", "detail", "advice"]
+                required: ["title", "detail", "guidance"]
               }
             },
             synthesis: { type: Type.STRING }

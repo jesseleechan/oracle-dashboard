@@ -11,6 +11,10 @@ export default function ArchiveInteractive({ initialLogs }) {
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [activeMonth, setActiveMonth] = useState(null);
+  const [oracleTimeframe, setOracleTimeframe] = useState('30'); // '30' or '90'
+  const [typedPatterns, setTypedPatterns] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
 
   const triggerConfetti = (e) => {
     const rect = e.target.getBoundingClientRect();
@@ -132,15 +136,26 @@ export default function ArchiveInteractive({ initialLogs }) {
   async function generatePatternOracle() {
     setIsOracleLoading(true);
     setOracleData(null);
+    setTypedPatterns([]);
+    setIsPinned(false);
     try {
+      // Also fetch journals
+      const journalsRes = await fetch(`/api/journal?limit=${oracleTimeframe === '90' ? 90 : 30}`);
+      const journalsData = await journalsRes.json();
+      
       const response = await fetch('/api/pattern-oracle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ logs: logs.slice(0, 60) })
+        body: JSON.stringify({ 
+          logs: logs.slice(0, parseInt(oracleTimeframe)),
+          journals: journalsData.entries || [],
+          timeframe: oracleTimeframe
+        })
       });
       if (!response.ok) throw new Error("Failed to fetch patterns");
       const data = await response.json();
       setOracleData(data);
+      typewriterReveal(data.patterns || []);
     } catch (e) {
       console.error(e);
       alert("Pattern Oracle could not connect to the ether. Try again.");
@@ -148,6 +163,50 @@ export default function ArchiveInteractive({ initialLogs }) {
       setIsOracleLoading(false);
     }
   }
+
+  const typewriterReveal = (patternsArray) => {
+    setIsTyping(true);
+    let currentIdx = 0;
+    const interval = setInterval(() => {
+      if (currentIdx < patternsArray.length) {
+        setTypedPatterns(prev => [...prev, patternsArray[currentIdx]]);
+        currentIdx++;
+      } else {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 800);
+  };
+
+  const handlePinInsight = async () => {
+    if (!oracleData) return;
+    try {
+      const res = await fetch('/api/patterns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeframe: oracleTimeframe,
+          patterns: JSON.stringify(oracleData)
+        })
+      });
+      if (res.ok) setIsPinned(true);
+    } catch (e) {
+      console.error('Failed to pin pattern:', e);
+    }
+  };
+
+  const syncIntegration = (action, text) => {
+    if (action === 'sats') {
+       localStorage.setItem('satsInjectedPattern', text);
+       alert("Pattern injected into tonight's SATS script.");
+    } else if (action === 'revision') {
+       localStorage.setItem('revisionInjectedPattern', text);
+       alert("Pattern seeded for the Revision Chamber.");
+    } else if (action === 'synthesis') {
+       localStorage.setItem('dailySynthesisPattern', text);
+       alert("Pattern will weave into tomorrow's synthesis.");
+    }
+  };
 
   return (
     <div className="dashboard" style={{ minHeight: '100vh', padding: '32px' }}>
@@ -176,35 +235,68 @@ export default function ArchiveInteractive({ initialLogs }) {
         </header>
 
         {/* Pattern Oracle UI */}
-        <section className="section">
-          <div className="section-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Pattern Oracle</span>
-            <button className="generate-btn" onClick={generatePatternOracle} disabled={isOracleLoading} style={{ padding: '4px 12px', fontSize: '10px' }}>
-              <Sparkles size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }}/>
-              {isOracleLoading ? "Synthesizing..." : "Analyze Last 60 Days"}
-            </button>
+        <section className={`section ${oracleData ? 'oracle-active' : ''}`} style={{ position: 'relative' }}>
+          {oracleData && <div className="oracle-starfield-bg" />}
+          <div className="section-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+            <span style={{ color: oracleData ? 'var(--transit-hue, var(--gold))' : 'inherit', textShadow: oracleData ? '0 0 10px rgba(201,169,110,0.5)' : 'none' }}>Advanced Pattern Oracle</span>
+            
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <select 
+                value={oracleTimeframe} 
+                onChange={(e) => setOracleTimeframe(e.target.value)}
+                style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--text)', fontFamily: 'Inconsolata', fontSize: '11px', padding: '4px 8px' }}
+              >
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+              </select>
+              <button className="generate-btn" onClick={generatePatternOracle} disabled={isOracleLoading} style={{ padding: '4px 12px', fontSize: '10px', borderColor: 'var(--transit-hue, var(--gold))' }}>
+                <Sparkles size={12} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }}/>
+                {isOracleLoading ? "Reading the Ether..." : "Invoke Oracle"}
+              </button>
+            </div>
           </div>
           
           {(oracleData || isOracleLoading) && (
-            <div className={`studio-block ${oracleData ? 'expanded' : ''}`} style={{ marginBottom: '40px', borderColor: 'var(--rose)' }}>
+            <div className={`studio-block ${oracleData ? 'expanded pattern-block' : ''}`} style={{ marginBottom: '40px', borderColor: 'var(--transit-hue, var(--gold))', position: 'relative', zIndex: 10 }}>
               {isOracleLoading ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100px', fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', opacity: 0.6 }}>
-                  ✦ Scanning the timeline...
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100px', fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', opacity: 0.6, animation: 'pulse 2s infinite' }}>
+                  ✦ Gazing into the Akashic records...
                 </div>
               ) : oracleData ? (
                 <div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-                    {oracleData.patterns?.map((p, i) => (
-                      <div key={i} style={{ borderLeft: '2px solid rgba(214,106,106,0.3)', paddingLeft: '16px' }}>
-                        <div style={{ fontFamily: 'Inconsolata', fontSize: '12px', color: 'var(--rose)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>{p.title}</div>
-                        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '15px', color: 'var(--text)', lineHeight: '1.4', marginBottom: '4px' }}>{p.detail}</div>
-                        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '14px', fontStyle: 'italic', color: 'var(--gold)' }}>{p.advice}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '32px' }}>
+                    {typedPatterns.map((p, i) => (
+                      <div key={i} className="pattern-card-fade" style={{ border: '1px solid rgba(201,169,110,0.2)', padding: '20px', background: 'rgba(0,0,0,0.4)', borderRadius: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                          <div style={{ fontFamily: 'Inconsolata', fontSize: '13px', color: 'var(--transit-hue, var(--gold))', textTransform: 'uppercase', letterSpacing: '0.15em' }}>{p.title}</div>
+                          
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button onClick={() => syncIntegration('sats', p.guidance)} style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: '9px', fontFamily: 'Inconsolata', textTransform: 'uppercase', padding: '2px 6px', cursor: 'pointer' }}>To SATS</button>
+                            <button onClick={() => syncIntegration('revision', p.guidance)} style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: '9px', fontFamily: 'Inconsolata', textTransform: 'uppercase', padding: '2px 6px', cursor: 'pointer' }}>To Revision</button>
+                          </div>
+                        </div>
+                        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '16px', color: 'var(--text)', lineHeight: '1.5', marginBottom: '12px' }}>{p.detail}</div>
+                        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '15px', fontStyle: 'italic', color: 'var(--rose)' }}>✦ {p.guidance}</div>
                       </div>
                     ))}
                   </div>
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '16px', fontFamily: 'Inter', fontSize: '12px', color: 'var(--muted)', lineHeight: '1.6' }}>
-                    {oracleData.synthesis}
-                  </div>
+                  
+                  {!isTyping && (
+                    <div className="pattern-card-fade" style={{ borderTop: '1px dashed rgba(201,169,110,0.3)', paddingTop: '24px', position: 'relative' }}>
+                      <div style={{ fontFamily: 'Inter', fontSize: '13px', color: 'var(--text)', lineHeight: '1.6', opacity: 0.9, marginBottom: '24px' }}>
+                        {oracleData.synthesis}
+                      </div>
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <button onClick={() => syncIntegration('synthesis', oracleData.synthesis)} style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--muted)', fontSize: '10px', fontFamily: 'Inconsolata', textTransform: 'uppercase', padding: '6px 12px', cursor: 'pointer', letterSpacing: '0.1em' }}>
+                          Weave into Daily Synthesis
+                        </button>
+                        <button onClick={handlePinInsight} disabled={isPinned} style={{ background: isPinned ? 'transparent' : 'var(--transit-hue, var(--gold))', border: isPinned ? '1px solid var(--transit-hue, var(--gold))' : 'none', color: isPinned ? 'var(--transit-hue, var(--gold))' : '#000', fontSize: '10px', fontFamily: 'Inconsolata', textTransform: 'uppercase', padding: '6px 16px', cursor: 'pointer', letterSpacing: '0.1em', fontWeight: 'bold' }}>
+                          {isPinned ? '✦ Insight Pinned to Archive' : 'Pin Insight'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>

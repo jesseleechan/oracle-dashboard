@@ -10,14 +10,15 @@ const LOADING_PHRASES = [
 ];
 
 const LAYER_ICONS = {
-  planetary: { icon: '☿', label: 'Planetary Hour' },
-  numerology: { icon: '⑦', label: 'Numerology' },
-  hermetic: { icon: '☤', label: 'Hermetic Law' },
-  tree: { icon: '✡', label: 'Tree of Life' },
-  dream: { icon: '🌙', label: 'Dream/Synch' },
-  assumption: { icon: '◉', label: 'Assumption' },
-  sensory: { icon: '✋', label: 'Sensory Script' },
-  asteroid: { icon: '⚷', label: 'Asteroid Whisper' }
+  planetary: { icon: '♄', label: 'Planetary Hour' },
+  numerology: { icon: '#', label: 'Universal Day' },
+  hermetic: { icon: '☤', label: 'Hermetic Principle' },
+  tree: { icon: '⬡', label: 'Tree of Life' },
+  dream: { icon: '☾', label: 'Dream Oracle' },
+  assumption: { icon: '👁', label: 'State Akin to Sleep' },
+  sensory: { icon: '〰', label: 'Sensory Script' },
+  asteroid: { icon: '⚷', label: 'Asteroid Whisper' },
+  stars: { icon: '✨', label: 'Stellar Alignment' }
 };
 
 export default function SynthesisEngine({ aiOutput, aiLoading, visibleCards, generateStudioInsight, onDeepen }) {

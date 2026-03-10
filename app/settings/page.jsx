@@ -12,6 +12,8 @@ export default function SettingsPage() {
   const [isImporting, setIsImporting] = useState(false);
   const [birthdate, setBirthdate] = useState('');
   const [showAsteroidWhisperer, setShowAsteroidWhisperer] = useState('true');
+  const [showAncientStars, setShowAncientStars] = useState('true');
+  const [showPatternOracle, setShowPatternOracle] = useState('true');
 
   useEffect(() => {
     // Hydrate from localStorage
@@ -20,12 +22,16 @@ export default function SettingsPage() {
     const suffix = localStorage.getItem('geminiSuffix');
     const key = localStorage.getItem('customApiKey');
     const asteroids = localStorage.getItem('showAsteroidWhisperer');
+    const ancientStars = localStorage.getItem('showAncientStars');
+    const oracle = localStorage.getItem('showPatternOracle');
 
     if (density) setStarfieldDensity(density);
     if (pattern) setBreathingPattern(pattern);
     if (suffix) setGeminiSuffix(suffix);
     if (key) setApiKey(key);
     if (asteroids) setShowAsteroidWhisperer(asteroids);
+    if (ancientStars) setShowAncientStars(ancientStars);
+    if (oracle) setShowPatternOracle(oracle);
 
     // Birthdate
     const bm = localStorage.getItem('birthMonth');
@@ -42,6 +48,8 @@ export default function SettingsPage() {
     localStorage.setItem('geminiSuffix', geminiSuffix);
     localStorage.setItem('customApiKey', apiKey);
     localStorage.setItem('showAsteroidWhisperer', showAsteroidWhisperer);
+    localStorage.setItem('showAncientStars', showAncientStars);
+    localStorage.setItem('showPatternOracle', showPatternOracle);
 
     // Save birthdate parts
     if (birthdate) {
@@ -157,6 +165,30 @@ export default function SettingsPage() {
                 style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 12px', fontFamily: 'Inconsolata', fontSize: '12px' }}
               >
                 <option value="true">Enabled (Whispers in Cosmic Baseline)</option>
+                <option value="false">Disabled</option>
+              </select>
+            </div>
+
+            <div style={{ marginTop: '24px' }}>
+              <label style={{ display: 'block', fontFamily: 'Inconsolata', fontSize: '11px', color: 'var(--rose)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Fixed Stars & Lunar Mansions</label>
+              <select 
+                value={showAncientStars} 
+                onChange={e => setShowAncientStars(e.target.value)}
+                style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 12px', fontFamily: 'Inconsolata', fontSize: '12px' }}
+              >
+                <option value="true">Enabled (Stellar Alignments in Baseline)</option>
+                <option value="false">Disabled</option>
+              </select>
+            </div>
+
+            <div style={{ marginTop: '24px' }}>
+              <label style={{ display: 'block', fontFamily: 'Inconsolata', fontSize: '11px', color: 'var(--rose)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Pattern Oracle Integration</label>
+              <select 
+                value={showPatternOracle} 
+                onChange={e => setShowPatternOracle(e.target.value)}
+                style={{ width: '100%', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', color: 'var(--text)', padding: '8px 12px', fontFamily: 'Inconsolata', fontSize: '12px' }}
+              >
+                <option value="true">Enabled (Weaving saved patterns into daily flow)</option>
                 <option value="false">Disabled</option>
               </select>
             </div>

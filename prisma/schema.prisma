@@ -41,3 +41,11 @@ model JournalEntry {
   linkedToSceneId String?
   createdAt       DateTime  @default(now())
 }
+
+model SavedPattern {
+  id        String   @id @default(cuid())
+  date      String
+  timeframe String   // "30" or "90"
+  patterns  String   // JSON stringified Gemini response
+  createdAt DateTime @default(now())
+}

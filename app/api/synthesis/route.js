@@ -3,6 +3,43 @@ import { USER_CONSTANTS } from '@/lib/config';
 import { GoogleGenAI, Type } from '@google/genai';
 import { Moon } from 'lunarphase-js';
 
+function buildSynthesisContext(data) {
+  const parts = [];
+  
+  if (data.currentPhase) parts.push(`Moon Phase: ${data.currentPhase}`);
+  if (data.universalDay) parts.push(`Universal Day Number: ${data.universalDay}`);
+  if (data.transit) parts.push(`Daily Transit: ${data.transit.aspect}`);
+  if (data.tarotCards) parts.push(`Tarot Cards Drawn: ${data.tarotCards}`);
+  
+  if (data.planetaryHour) parts.push(`Planetary Hour: ${data.planetaryHour}`);
+  if (data.personalYear) parts.push(`Personal Numerology: Year ${data.personalYear}${data.yearArchetype ? ` (${data.yearArchetype})` : ''}, Month ${data.personalMonth}, Day ${data.personalDay}`);
+  
+  if (data.hermeticPrinciple) parts.push(`Hermetic Principle: ${data.hermeticPrinciple}${data.hermeticAxiom ? ` — "${data.hermeticAxiom}"` : ''}`);
+  
+  if (data.mappedSephira || data.mappedPath) {
+    const treeParts = [];
+    if (data.mappedSephira) treeParts.push(`Sephira: ${data.mappedSephira}`);
+    if (data.mappedPath) treeParts.push(`Path: ${data.mappedPath}`);
+    parts.push(`Tree of Life Mapping: ${treeParts.join(', ')}`);
+  }
+  
+  if (data.dreamInsight) parts.push(`Morning Dream Wisdom: "${data.dreamInsight}"`);
+  if (data.synchronicityInsight) parts.push(`Noted Synchronicity: "${data.synchronicityInsight}"`);
+  
+  if (data.assumptionText) parts.push(`Living in the End (Assumption): "${data.assumptionText}" (Feeling intensity: ${data.feelingRating || '?'}/10)`);
+  if (data.sensoryScript) parts.push(`Active Sensory Script: "${data.sensoryScript.substring(0, 100)}..."`);
+  
+  if (data.ancientStarsInsight) parts.push(`Fixed Stars & Lunar Mansion: ${data.ancientStarsInsight}`);
+  
+  if (data.asteroidWisdom && data.asteroidWisdom.length > 0) {
+    parts.push(`Asteroid Whispers: ${data.asteroidWisdom.map(a => `${a.name} (${a.transit}): ${a.insight}`).join(' | ')}`);
+  }
+  
+  if (data.dailyPattern) parts.push(`Saved Macro-Pattern to Integrate: "${data.dailyPattern}"`);
+  
+  return parts.map(p => `- ${p}`).join('\n');
+}
+
 export async function POST(request) {
   try {
     const {
@@ -14,6 +51,8 @@ export async function POST(request) {
       dreamInsight, synchronicityInsight,
       sensoryScript,
       asteroidWisdom,
+      ancientStarsInsight,
+      dailyPattern,
       deepen
     } = await request.json();
     
@@ -39,42 +78,42 @@ export async function POST(request) {
     if (assumptionText) layers.push('assumption');
     if (sensoryScript) layers.push('sensory');
     if (asteroidWisdom && asteroidWisdom.length > 0) layers.push('asteroid');
+    if (ancientStarsInsight) layers.push('stars');
+    if (dailyPattern) layers.push('pattern');
     const depth = layers.length;
+
+    const contextString = buildSynthesisContext({
+      currentPhase, universalDay, transit, tarotCards,
+      planetaryHour, personalYear, personalMonth, personalDay, yearArchetype,
+      hermeticPrinciple, hermeticAxiom, mappedSephira, mappedPath,
+      dreamInsight, synchronicityInsight, assumptionText, feelingRating,
+      sensoryScript, ancientStarsInsight, asteroidWisdom, dailyPattern
+    });
 
     const prompt = `You are a unified esoteric oracle for ${USER_CONSTANTS.name}, a ${USER_CONSTANTS.profession}.
 
 CORE LAW: NEVILLE GODDARD'S "LAW OF REVERSE EFFORT" — never advise hustling, grinding, or forcing. All guidance flows from the feeling of the wish fulfilled, calm certainty, and natural allowing. Success is already an established fact.
 
 TODAY'S COSMIC FIELD:
-- Moon Phase: ${currentPhase}
-- Transit: ${transit.aspect}
-- Universal Day Number: ${universalDay}
-- Tarot drawn: ${tarotCards}
-${planetaryHour ? `- Planetary Hour: ${planetaryHour} (channel this planet's energy)` : ''}
-${personalYear ? `- Personal Year ${personalYear}${yearArchetype ? ` — ${yearArchetype}` : ''}, Month ${personalMonth}, Day ${personalDay}` : ''}
-${hermeticPrinciple ? `- Hermetic Principle: ${hermeticPrinciple}${hermeticAxiom ? ` — "${hermeticAxiom}"` : ''}` : ''}
-${mappedSephira ? `- Tree of Life: Scene mapped to ${mappedSephira}` : ''}${mappedPath ? `- Tree of Life: Scene on Path ${mappedPath}` : ''}
-${dreamInsight ? `- Morning dream wisdom: "${dreamInsight}"` : ''}
-${synchronicityInsight ? `- Synchronicity noted: "${synchronicityInsight}"` : ''}
-${assumptionText ? `- Living in the End: "${assumptionText}" (feeling: ${feelingRating || '?'}/10)` : ''}
-${sensoryScript ? `- Active sensory script: "${sensoryScript.substring(0, 100)}"` : ''}
-${asteroidWisdom && asteroidWisdom.length > 0 ? `- Asteroid Whispers: ${asteroidWisdom.map(a => `${a.name} (${a.transit}): ${a.insight}`).join(' | ')}` : ''}
+${contextString}
 
 ${geminiSuffix ? `USER DIRECTIVES: ${geminiSuffix}\n` : ''}
 
-SYNTHESIS INSTRUCTIONS:
-${depth >= 4 ? `ALL LAYERS ARE ACTIVE (${depth}). This is a moment of deep alignment. The synthesis must feel like ONE LIVING VOICE from the cosmos — not a list of disconnected readings.` : ''}
-Weave every active influence into a single poetic, hypnotic message. Speak directly to the subconscious. 
-- Paragraph 1: The cosmic weather — moon, transit, planetary hour, root numerology, and asteroid influences unified into one flowing narrative
-- Paragraph 2: Tarot synthesis filtered through the Hermetic Principle and Tree of Life mapping (if present), connected to the Living in the End assumption and any dream/synchronicity wisdom
-${deepen ? '- Go DEEPER: emphasize the Tree of Life + Dream + Asteroid shadow layers. Make the pathworking connection explicit and the symbols vivid.' : ''}
-- End with one gentle SATS suggestion or action for tonight
-- Tone: mysterious, precise, deeply personal, matter-of-fact about fulfillment
-- NEVER sound like a list. This must flow like a single channeled transmission.
+SYNTHESIS PARADIGM:
+${depth >= 4 ? `ALL LAYERS ARE ACTIVE (${depth}). This is a moment of deep, total alignment. The synthesis must reflect this profound esoteric resonance.` : ''}
+Weave EVERY active influence into a SINGLE, hypnotic, continuously flowing prose message. ABSOLUTELY NO BULLET POINTS. NO NUMBERED LISTS. NO SECTION HEADINGS. Do not list the transits back to me. Speak directly to the soul and subconscious, translating all these technical astrological, numerological, and qabalistic details into a pure emotional and spiritual landscape.
+
+Structure exactly 2 paragraphs:
+Paragraph 1: The Cosmic Weather. Synthesize the moon, transit, hour, numerology, fixed stars, and asteroids into a lush, atmospheric description of today's energy.
+Paragraph 2: The Oracle's Command. Filter the Tarot through the Hermetic Principle, Tree of Life, and Dream/Synchronicity wisdom. Connect this deeply to the Living in the End assumption. 
+${deepen ? '- Go DEEPER: emphasize shadow layers, ancestral lessons, and unseen orchestrations pulling the wish into physical reality.' : ''}
+
+End the second paragraph with a natural, gentle command for tonight's SATS (State Akin to Sleep). 
+Tone: lyrical, mysterious, intimately knowing, grounded in absolute manifestation certainty.
 
 Return a strict JSON object:
 - tags: 3 relevant # tags
-- insight: The full 2-paragraph unified oracle (separate with \\n)
+- insight: The full 2-paragraph flowing prose oracle (separate paragraphs with exactly one \\n\\n, DO NOT use bullet points or dashes)
 - energyRatings: 8 objects scoring { category, rating } — categories: Career Ambition, Spiritual Attunement, Financial Resources, Mental Flow, Emotional State, Social Connection, Physical Vitality, Romantic Charge — ratings: "Strong", "Active", or "Light"
 - layersActive: ${JSON.stringify(layers)}
 - depth: ${depth}`;
